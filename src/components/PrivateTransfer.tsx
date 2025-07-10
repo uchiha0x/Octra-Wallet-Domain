@@ -222,10 +222,12 @@ export function PrivateTransfer({ wallet, onTransactionSuccess }: PrivateTransfe
         </CardHeader>
         <CardContent>
           <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              No encrypted balance available. You need to encrypt some balance first to make private transfers.
-            </AlertDescription>
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <AlertDescription>
+                No encrypted balance available. You need to encrypt some balance first to make private transfers.
+              </AlertDescription>
+            </div>
           </Alert>
         </CardContent>
       </Card>
