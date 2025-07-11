@@ -33,6 +33,20 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
     setIsImporting(true);
     try {
       const wallet = await importWalletFromPrivateKey(privateKey.trim());
+      
+      // Check if wallet already exists
+      const existingWallets = JSON.parse(localStorage.getItem('wallets') || '[]');
+      const walletExists = existingWallets.some((w: Wallet) => w.address === wallet.address);
+      
+      if (walletExists) {
+        toast({
+          title: "Wallet Already Exists",
+          description: "This wallet is already in your collection",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       onWalletImported(wallet);
       toast({
         title: "Success!",
@@ -62,6 +76,20 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
     setIsImporting(true);
     try {
       const wallet = await importWalletFromMnemonic(mnemonic.trim());
+      
+      // Check if wallet already exists
+      const existingWallets = JSON.parse(localStorage.getItem('wallets') || '[]');
+      const walletExists = existingWallets.some((w: Wallet) => w.address === wallet.address);
+      
+      if (walletExists) {
+        toast({
+          title: "Wallet Already Exists",
+          description: "This wallet is already in your collection",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       onWalletImported(wallet);
       toast({
         title: "Success!",
@@ -129,7 +157,7 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
                 Importing...
               </>
             ) : (
-              "Import from Private Key"
+              "Import Wallet"
             )}
           </Button>
         </TabsContent>
@@ -162,7 +190,7 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
                 Importing...
               </>
             ) : (
-              "Import from Mnemonic"
+              "Import Wallet"
             )}
           </Button>
         </TabsContent>

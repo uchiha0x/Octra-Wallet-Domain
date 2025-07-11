@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -12,7 +14,11 @@ import {
   Copy,
   PieChart,
   Shield,
-  Gift
+  Gift,
+  ChevronDown,
+  Plus,
+  Trash2,
+  Check
 } from 'lucide-react';
 import { Balance } from './Balance';
 import { MultiSend } from './MultiSend';
@@ -21,6 +27,7 @@ import { PrivateTransfer } from './PrivateTransfer';
 import { ClaimTransfers } from './ClaimTransfers';
 import { TxHistory } from './TxHistory';
 import { ThemeToggle } from './ThemeToggle';
+import { ImportWallet } from './ImportWallet';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, getTransactionHistory } from '../utils/api';
 import { useToast } from '@/hooks/use-toast';
@@ -37,16 +44,28 @@ interface Transaction {
 
 interface WalletDashboardProps {
   wallet: Wallet;
+  wallets: Wallet[];
   onDisconnect: () => void;
+  onSwitchWallet: (wallet: Wallet) => void;
+  onAddWallet: (wallet: Wallet) => void;
+  onRemoveWallet: (wallet: Wallet) => void;
 }
 
-export function WalletDashboard({ wallet, onDisconnect }: WalletDashboardProps) {
+export function WalletDashboard({ 
+  wallet, 
+  wallets, 
+  onDisconnect, 
+  onSwitchWallet, 
+  onAddWallet, 
+  onRemoveWallet 
+}: WalletDashboardProps) {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true);
   const [nonce, setNonce] = useState(0);
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const { toast } = useToast();
 
   // Initial data fetch when wallet is connected
@@ -115,11 +134,38 @@ export function WalletDashboard({ wallet, onDisconnect }: WalletDashboardProps) 
   };
 
   const handleDisconnect = () => {
-    if (window.confirm('Are you sure you want to disconnect your wallet? Make sure you have backed up your private key or mnemonic phrase.')) {
+    if (window.confirm('Are you sure you want to disconnect all wallets? Make sure you have backed up your private keys or mnemonic phrases.')) {
       onDisconnect();
     }
   };
 
+  const handleRemoveWallet = (walletToRemove: Wallet) => {
+    if (wallets.length === 1) {
+      toast({
+        title: "Cannot Remove",
+        description: "You cannot remove the last wallet. Use disconnect instead.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (window.confirm(`Are you sure you want to remove wallet ${truncateAddress(walletToRemove.address)}?`)) {
+      onRemoveWallet(walletToRemove);
+      toast({
+        title: "Wallet Removed",
+        description: "Wallet has been removed successfully",
+      });
+    }
+  };
+
+  const handleImportSuccess = (newWallet: Wallet) => {
+    onAddWallet(newWallet);
+    setShowImportDialog(false);
+    toast({
+      title: "Wallet Added",
+      description: "New wallet has been added successfully",
+    });
+  };
   const handleBalanceUpdate = async (newBalance: number) => {
     setBalance(newBalance);
     // Also refresh nonce when balance is updated
@@ -187,9 +233,69 @@ export function WalletDashboard({ wallet, onDisconnect }: WalletDashboardProps) 
                 <div>
                   <h1 className="text-xl font-bold">Octra Wallet</h1>
                   <div className="flex items-center space-x-2">
-                    <p className="text-sm text-muted-foreground">
-                      {truncateAddress(wallet.address)}
-                    </p>
+                    {/* Wallet Selector */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+                          <div className="flex items-center space-x-2">
+                            <p className="text-sm text-muted-foreground">
+                              {truncateAddress(wallet.address)}
+                            </p>
+                            <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                          </div>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-80">
+                        <div className="px-2 py-1.5 text-sm font-medium">
+                          Select Wallet ({wallets.length})
+                        </div>
+                        <DropdownMenuSeparator />
+                        {wallets.map((w) => (
+                          <DropdownMenuItem
+                            key={w.address}
+                            onClick={() => onSwitchWallet(w)}
+                            className="flex items-center justify-between p-3"
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-mono text-sm">
+                                  {truncateAddress(w.address)}
+                                </span>
+                                {w.address === wallet.address && (
+                                  <Check className="h-4 w-4 text-green-500" />
+                                )}
+                              </div>
+                              {w.mnemonic && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  Generated wallet
+                                </div>
+                              )}
+                            </div>
+                            {wallets.length > 1 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveWallet(w);
+                                }}
+                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => setShowImportDialog(true)}
+                          className="flex items-center space-x-2 p-3"
+                        >
+                          <Plus className="h-4 w-4" />
+                          <span>Add Wallet</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -208,11 +314,28 @@ export function WalletDashboard({ wallet, onDisconnect }: WalletDashboardProps) 
                 <Badge variant="outline" className="hidden sm:inline-flex text-xs">
                   Nonce: {nonce}
                 </Badge>
+                <Badge variant="outline" className="hidden sm:inline-flex text-xs">
+                  {wallets.length} Wallet{wallets.length !== 1 ? 's' : ''}
+                </Badge>
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
               <ThemeToggle />
+              <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Wallet
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Import Additional Wallet</DialogTitle>
+                  </DialogHeader>
+                  <ImportWallet onWalletImported={handleImportSuccess} />
+                </DialogContent>
+              </Dialog>
               <Button
                 variant="outline"
                 size="sm"
@@ -220,7 +343,7 @@ export function WalletDashboard({ wallet, onDisconnect }: WalletDashboardProps) 
                 className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Disconnect
+                Disconnect All
               </Button>
             </div>
           </div>

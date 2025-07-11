@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { GenerateWallet } from './GenerateWallet';
 import { ImportWallet } from './ImportWallet';
-import { Wallet as WalletIcon, Plus, Download } from 'lucide-react';
+import { Wallet as WalletIcon, Plus, Download, Info } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 
 interface WelcomeScreenProps {
@@ -13,6 +14,12 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onWalletCreated }: WelcomeScreenProps) {
   const [activeTab, setActiveTab] = useState<string>('generate');
+  
+  // Check if there are existing wallets
+  const hasExistingWallets = () => {
+    const storedWallets = localStorage.getItem('wallets');
+    return storedWallets && JSON.parse(storedWallets).length > 0;
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -28,14 +35,27 @@ export function WelcomeScreen({ onWalletCreated }: WelcomeScreenProps) {
           <p className="text-xl text-muted-foreground mb-6">
             Your secure gateway to the Octra blockchain
           </p>
+          {hasExistingWallets() && (
+            <Alert className="max-w-md mx-auto mb-6">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                You have existing wallets. Creating or importing a new wallet will add it to your collection.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         {/* Main Card */}
         <Card className="shadow-2xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl">Get Started</CardTitle>
+            <CardTitle className="text-2xl">
+              {hasExistingWallets() ? 'Add Another Wallet' : 'Get Started'}
+            </CardTitle>
             <p className="text-muted-foreground">
-              Create a new wallet or import an existing one to begin
+              {hasExistingWallets() 
+                ? 'Create a new wallet or import an existing one to add to your collection'
+                : 'Create a new wallet or import an existing one to begin'
+              }
             </p>
           </CardHeader>
           <CardContent>
