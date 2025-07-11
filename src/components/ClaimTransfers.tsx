@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Gift, RefreshCw, Wallet as WalletIcon, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Gift, RefreshCw, Wallet as WalletIcon, CheckCircle, AlertTriangle, Loader2, Package } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { getPendingPrivateTransfers, claimPrivateTransfer, fetchEncryptedBalance } from '../utils/api';
 import { deriveSharedSecretForClaim, decryptPrivateAmount } from '../utils/crypto';
@@ -25,6 +25,7 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
   const [transfers, setTransfers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const [claimingAll, setClaimingAll] = useState(false);
   const { toast } = useToast();
 
   const fetchTransfers = async () => {
@@ -122,6 +123,73 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
     }
   };
 
+  const handleClaimAll = async () => {
+    if (!wallet || transfers.length === 0) return;
+    
+    setClaimingAll(true);
+    
+    try {
+      let successCount = 0;
+      let totalAmount = 0;
+      const errors: string[] = [];
+      
+      // Process transfers sequentially to avoid overwhelming the server
+      for (const transfer of transfers) {
+        try {
+          const result = await claimPrivateTransfer(wallet.address, wallet.privateKey, transfer.id);
+          
+          if (result.success) {
+            successCount++;
+            if (result.amount) {
+              totalAmount += parseFloat(result.amount);
+            }
+          } else {
+            errors.push(`Transfer ${transfer.id}: ${result.error || 'Unknown error'}`);
+          }
+          
+          // Small delay between claims to be respectful to the server
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          errors.push(`Transfer ${transfer.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      }
+      
+      // Show results
+      if (successCount > 0) {
+        toast({
+          title: "Claim All Completed!",
+          description: `Successfully claimed ${successCount} out of ${transfers.length} transfers${totalAmount > 0 ? ` (Total: ${totalAmount.toFixed(8)} OCT)` : ''}`,
+        });
+        
+        // Refresh transfers list
+        await fetchTransfers();
+        
+        // Notify parent component
+        onTransactionSuccess();
+      }
+      
+      if (errors.length > 0) {
+        console.error('Claim errors:', errors);
+        if (successCount === 0) {
+          toast({
+            title: "Claim All Failed",
+            description: `Failed to claim any transfers. First error: ${errors[0]}`,
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Claim all error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to claim transfers",
+        variant: "destructive",
+      });
+    } finally {
+      setClaimingAll(false);
+    }
+  };
+
   if (!wallet) {
     return (
       <Alert>
@@ -156,6 +224,30 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
         </Button>
       </CardHeader>
       <CardContent>
+        {/* Claim All Button - Show only when there are multiple transfers */}
+        {transfers.length > 1 && (
+          <div className="mb-4">
+            <Button
+              onClick={handleClaimAll}
+              disabled={claimingAll || claimingId !== null}
+              className="w-full"
+              variant="default"
+            >
+              {claimingAll ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Claiming All Transfers...
+                </>
+              ) : (
+                <>
+                  <Package className="h-4 w-4 mr-2" />
+                  Claim All {transfers.length} Transfers
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+        
         {isLoading ? (
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">Loading pending transfers...</div>
@@ -213,14 +305,14 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
                 <div className="flex justify-end">
                   <Button
                     onClick={() => handleClaim(transfer.id)}
-                    disabled={claimingId === transfer.id}
+                    disabled={claimingId === transfer.id || claimingAll}
                     size="sm"
                     className="flex items-center gap-2"
                   >
-                    {claimingId === transfer.id ? (
+                    {claimingId === transfer.id || claimingAll ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Claiming...
+                        {claimingAll ? 'Processing...' : 'Claiming...'}
                       </>
                     ) : (
                       <>
