@@ -198,7 +198,7 @@ export function TxHistory({ wallet, transactions, onTransactionsUpdate, isLoadin
           Transaction History
           {pendingCount > 0 && (
             <Badge variant="secondary" className="ml-2">
-              {pendingCount} pending
+              {pendingCount}
             </Badge>
           )}
         </CardTitle>
