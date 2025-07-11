@@ -247,8 +247,8 @@ export function WalletDashboard({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-80 max-h-[70vh] p-0">
-                        <div className="px-2 py-1.5 text-sm font-medium">
-                          Select Wallet ({wallets.length})
+                        <div className="px-2 pt-1.5 pb-1 text-sm font-medium">
+                          Select Wallet ( {wallets.length} )
                         </div>
                         <DropdownMenuSeparator />
                         <div className="max-h-[50vh] overflow-y-auto p-1">

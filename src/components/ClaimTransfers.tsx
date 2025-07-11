@@ -189,7 +189,7 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">Transfer #{transfer.id}</span>
                       <Badge variant="outline" className="text-xs">
-                        Epoch {transfer.epoch_id}
+                        E.{transfer.epoch_id}
                       </Badge>
                     </div>
                     <div className="text-xs text-muted-foreground">
