@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Wallet as WalletIcon, 
   Send, 
@@ -245,55 +246,72 @@ export function WalletDashboard({
                           </div>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-80">
+                      <DropdownMenuContent align="start" className="w-80 max-h-[70vh] p-0">
                         <div className="px-2 py-1.5 text-sm font-medium">
                           Select Wallet ({wallets.length})
                         </div>
                         <DropdownMenuSeparator />
-                        {wallets.map((w) => (
-                          <DropdownMenuItem
-                            key={w.address}
-                            onClick={() => onSwitchWallet(w)}
-                            className="flex items-center justify-between p-3"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2">
-                                <span className="font-mono text-sm">
-                                  {truncateAddress(w.address)}
-                                </span>
-                                {w.address === wallet.address && (
-                                  <Check className="h-4 w-4 text-green-500" />
+                        <div className="max-h-[50vh] overflow-y-auto p-1">
+                          {wallets.map((w, i) => (
+                            <div
+                              key={w.address}
+                              className="flex items-center justify-between p-3 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer group"
+                              onClick={() => onSwitchWallet(w)}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-mono text-sm truncate">
+                                  #{i + 1} {truncateAddress(w.address)}
+                                  </span>
+                                  {w.address === wallet.address && (
+                                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                                  )}
+                                </div>
+                                {w.mnemonic && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    Generated wallet
+                                  </div>
                                 )}
                               </div>
-                              {w.mnemonic && (
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  Generated wallet
-                                </div>
-                              )}
+                              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(w.address, 'Address');
+                                  }}
+                                  className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                                  title="Copy address"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                                {wallets.length > 1 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleRemoveWallet(w);
+                                    }}
+                                    className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                    title="Remove wallet"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
                             </div>
-                            {wallets.length > 1 && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRemoveWallet(w);
-                                }}
-                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            )}
-                          </DropdownMenuItem>
-                        ))}
+                          ))}
+                        </div>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
+                        <div
                           onClick={() => setShowImportDialog(true)}
-                          className="flex items-center space-x-2 p-3"
+                          className="flex items-center justify-center space-x-2 p-3 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-sm mx-1 mb-1"
                         >
                           <Plus className="h-4 w-4" />
                           <span>Add Wallet</span>
-                        </DropdownMenuItem>
+                        </div>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <Button
