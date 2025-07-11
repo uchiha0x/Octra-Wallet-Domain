@@ -10,6 +10,12 @@ import { getPendingPrivateTransfers, claimPrivateTransfer, fetchEncryptedBalance
 import { deriveSharedSecretForClaim, decryptPrivateAmount } from '../utils/crypto';
 import { useToast } from '@/hooks/use-toast';
 
+function julianToDate(jd: number): Date {
+  const JD_UNIX_EPOCH = 2440587.5; // Julian Date of Unix epoch 1970-01-01
+  const msSinceEpoch = (jd - JD_UNIX_EPOCH) * 86400000;
+  return new Date(msSinceEpoch);
+}
+
 interface ClaimTransfersProps {
   wallet: Wallet | null;
   onTransactionSuccess: () => void;
@@ -199,7 +205,7 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
                       }
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(transfer.created_at).toLocaleDateString()}
+                    {julianToDate(transfer.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>

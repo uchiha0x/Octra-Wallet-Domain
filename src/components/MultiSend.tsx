@@ -317,7 +317,7 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
         <div className="space-y-2">
           <Label htmlFor="message" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            Message (Optional)
+            Message ( Optional )
           </Label>
           <Textarea
             id="message"

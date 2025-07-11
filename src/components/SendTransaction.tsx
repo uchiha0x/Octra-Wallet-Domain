@@ -252,7 +252,7 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
 
         {/* Amount */}
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount (OCT)</Label>
+          <Label htmlFor="amount">Amount ( OCT )</Label>
           <Input
             id="amount"
             type="number"
@@ -271,7 +271,7 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
         <div className="space-y-2">
           <Label htmlFor="message" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            Message (Optional)
+            Message ( Optional )
           </Label>
           <Textarea
             id="message"

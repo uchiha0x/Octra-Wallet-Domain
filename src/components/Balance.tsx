@@ -167,7 +167,7 @@ export function Balance({ wallet, balance, onBalanceUpdate, isLoading = false }:
 
           {/* Total Balance */}
           {encryptedBalance && (
-            <div className="pt-2 border-t">
+            <div className="pt-5 border-t">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">Total Balance</span>
                 <div className="text-lg font-bold text-green-600">
@@ -179,10 +179,10 @@ export function Balance({ wallet, balance, onBalanceUpdate, isLoading = false }:
 
           {/* Pending Transfers */}
           {pendingTransfers.length > 0 && (
-            <div className="pt-2 border-t">
+            <div className="pt-5 border-t">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">Claimable Transfers</span>
-                <Badge variant="outline" className="text-green-600">
+                <Badge variant="outline" className="text-green-600 pb-1">
                   {pendingTransfers.length} pending
                 </Badge>
               </div>
@@ -190,7 +190,7 @@ export function Balance({ wallet, balance, onBalanceUpdate, isLoading = false }:
           )}
 
           {/* Balance Actions */}
-          <div className="flex flex-wrap justify-center gap-2 pt-2 border-t">
+          <div className="flex flex-wrap justify-center gap-2 pt-5 border-t">
             <Button
               variant="outline"
               size="sm"
