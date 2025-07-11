@@ -135,7 +135,7 @@ export function ClaimTransfers({ wallet, onTransactionSuccess }: ClaimTransfersP
           Claim Private Transfers
           {transfers.length > 0 && (
             <Badge variant="secondary" className="ml-2">
-              {transfers.length} pending
+              {transfers.length}
             </Badge>
           )}
         </CardTitle>

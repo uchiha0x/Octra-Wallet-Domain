@@ -324,9 +324,9 @@ export function WalletDashboard({
               <ThemeToggle />
               <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Wallet
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline">Add Wallet</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -340,10 +340,10 @@ export function WalletDashboard({
                 variant="outline"
                 size="sm"
                 onClick={handleDisconnect}
-                className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-2"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                Disconnect All
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Disconnect All</span>
               </Button>
             </div>
           </div>
