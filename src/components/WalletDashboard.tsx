@@ -247,7 +247,7 @@ export function WalletDashboard({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-80 max-h-[70vh] p-0">
-                        <div className="px-2 pt-1.5 pb-1 text-sm font-medium">
+                        <div className="px-2 pt-1.5 pb-1 text-sm font-medium text-center w-full">
                           Select Wallet ( {wallets.length} )
                         </div>
                         <DropdownMenuSeparator />
@@ -404,24 +404,34 @@ export function WalletDashboard({
           </TabsContent>
 
           <TabsContent value="send">
-            <div className="space-y-6">
-              <SendTransaction
-                wallet={wallet} 
-                balance={balance}
-                nonce={nonce}
-                onBalanceUpdate={handleBalanceUpdate}
-                onNonceUpdate={handleNonceUpdate}
-                onTransactionSuccess={handleTransactionSuccess}
-              />
-              <MultiSend 
-                wallet={wallet} 
-                balance={balance}
-                nonce={nonce}
-                onBalanceUpdate={handleBalanceUpdate}
-                onNonceUpdate={handleNonceUpdate}
-                onTransactionSuccess={handleTransactionSuccess}
-              />
-            </div>
+            <Tabs defaultValue="single" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="single">Single Send</TabsTrigger>
+                <TabsTrigger value="multi">Multi Send</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="single" className="mt-6">
+                <SendTransaction
+                  wallet={wallet} 
+                  balance={balance}
+                  nonce={nonce}
+                  onBalanceUpdate={handleBalanceUpdate}
+                  onNonceUpdate={handleNonceUpdate}
+                  onTransactionSuccess={handleTransactionSuccess}
+                />
+              </TabsContent>
+              
+              <TabsContent value="multi" className="mt-6">
+                <MultiSend 
+                  wallet={wallet} 
+                  balance={balance}
+                  nonce={nonce}
+                  onBalanceUpdate={handleBalanceUpdate}
+                  onNonceUpdate={handleNonceUpdate}
+                  onTransactionSuccess={handleTransactionSuccess}
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="private">

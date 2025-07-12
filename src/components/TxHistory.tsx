@@ -233,7 +233,7 @@ export function TxHistory({ wallet, transactions, onTransactionsUpdate, isLoadin
         ) : (
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">
-              Found {transactions.length} transactions
+              Recent {transactions.length} transactions
               {pendingCount > 0 && ` (${pendingCount} pending)`}
             </div>
             {transactions.map((tx, index) => (

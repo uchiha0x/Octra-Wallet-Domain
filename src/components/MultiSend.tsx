@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 interface Recipient {
   address: string;
   amount: string;
+  message: string;
 }
 
 interface MultiSendProps {
@@ -28,15 +29,14 @@ interface MultiSendProps {
 
 export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpdate, onTransactionSuccess }: MultiSendProps) {
   const [recipients, setRecipients] = useState<Recipient[]>([
-    { address: '', amount: '' }
+    { address: '', amount: '', message: '' }
   ]);
-  const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [results, setResults] = useState<Array<{ success: boolean; hash?: string; error?: string; recipient: string; amount: string }>>([]);
   const { toast } = useToast();
 
   const addRecipient = () => {
-    setRecipients([...recipients, { address: '', amount: '' }]);
+    setRecipients([...recipients, { address: '', amount: '', message: '' }]);
   };
 
   const copyToClipboard = async (text: string, label: string) => {
@@ -130,14 +130,17 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
       return;
     }
 
-    // Validate message length (max 1024 characters like CLI)
-    if (message && message.length > 1024) {
-      toast({
-        title: "Error",
-        description: "Message too long (max 1024 characters)",
-        variant: "destructive",
-      });
-      return;
+    // Validate all messages length (max 1024 characters like CLI)
+    for (let i = 0; i < recipients.length; i++) {
+      const recipient = recipients[i];
+      if (recipient.message && recipient.message.length > 1024) {
+        toast({
+          title: "Error",
+          description: `Message for recipient ${i + 1} is too long (max 1024 characters)`,
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsSending(true);
@@ -175,7 +178,7 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
             transactionNonce,
             wallet.privateKey,
             wallet.publicKey || '',
-            message || undefined // Pass message if provided
+            recipient.message || undefined // Pass individual message if provided
           );
 
           batchPromises.push(
@@ -224,8 +227,7 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
 
         // Reset form if all successful
         if (successCount === transactionResults.length) {
-          setRecipients([{ address: '', amount: '' }]);
-          setMessage('');
+          setRecipients([{ address: '', amount: '', message: '' }]);
         }
 
         // Update nonce based on successful transactions
@@ -313,26 +315,6 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
           </div>
         </div>
 
-        {/* Message Field */}
-        <div className="space-y-2">
-          <Label htmlFor="message" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Message ( Optional )
-          </Label>
-          <Textarea
-            id="message"
-            placeholder="Enter an optional message (max 1024 characters)"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            maxLength={1024}
-            rows={3}
-          />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>This message will be included in all transactions</span>
-            <span>{message.length}/1024</span>
-          </div>
-        </div>
-
         {/* Recipients */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -390,6 +372,26 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
                     />
                   </div>
                 </div>
+
+                {/* Individual Message Field */}
+                <div className="space-y-2 mt-3">
+                  <Label htmlFor={`message-${index}`} className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Message ( Optional )
+                  </Label>
+                  <Textarea
+                    id={`message-${index}`}
+                    placeholder="Enter an optional message for this recipient (max 1024 characters)"
+                    value={recipient.message}
+                    onChange={(e) => updateRecipient(index, 'message', e.target.value)}
+                    maxLength={1024}
+                    rows={2}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>This message will be included in the transaction to this recipient</span>
+                    <span>{recipient.message.length}/1024</span>
+                  </div>
+                </div>
               </div>
             </Card>
           ))}
@@ -433,6 +435,11 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         <span className="font-medium">Fee:</span> {calculateFee(Number(result.amount) || 0).toFixed(3)} OCT
                       </p>
+                      {recipients.find(r => r.address === result.recipient)?.message && (
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <span className="font-medium">Message:</span> {recipients.find(r => r.address === result.recipient)?.message}
+                        </p>
+                      )}
                     </div>
                     {result.success && result.hash && (
                       <div className="mt-2">
@@ -538,17 +545,12 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
                 ⚠️ Insufficient balance for this transaction
               </div>
             )}
-            {message && (
-              <div className="text-xs text-muted-foreground mt-2 break-words">
-                <span className="font-medium">Message:</span> {message.length > 50 ? message.substring(0, 50) + '...' : message}
-              </div>
-            )}
           </div>
         </div>
 
         <Button 
           onClick={handleSendMultiple}
-          disabled={isSending || !validateRecipients() || totalCost > currentBalance}
+          disabled={isSending || !validateRecipients() || totalCost > currentBalance || recipients.some(r => r.message && r.message.length > 1024)}
           className="w-full text-sm sm:text-base"
           size="lg"
         >
