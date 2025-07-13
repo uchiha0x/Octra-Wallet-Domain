@@ -26,7 +26,7 @@ app.use(limiter);
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:5173', 'http://localhost:3000'];
+  : ['http://localhost:5173', 'http://localhost:3000','https://octra.xme.my.id','https://api-oct-domain.xme.my.id'];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -56,7 +56,7 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api/domain', domainRoutes);
+app.use('/', domainRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -73,9 +73,9 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
-});
+// app.use('*', (req, res) => {
+//   res.status(404).json({ error: 'Endpoint not found' });
+// });
 
 // Initialize database and start server
 async function startServer() {

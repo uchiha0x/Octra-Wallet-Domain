@@ -36,10 +36,16 @@ export default defineConfig({
         secure: true, // If the target is HTTPS (recommended)
       },
       // Separate proxy for domain API if needed
+      // '/domain-api': {
+      //   target: 'http://localhost:3001',
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/domain-api/, '/api'),
+      //   secure: false,
+      // },
       '/domain-api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/domain-api/, '/api'),
+        rewrite: (path) => path.replace(/^\/domain-api/, ''), // jangan tambah /api
         secure: false,
       },
     },

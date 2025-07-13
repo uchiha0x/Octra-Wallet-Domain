@@ -35,7 +35,7 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
     const transaction = createTransaction(
       request.ownerAddress,
       DOMAIN_MASTER_ADDRESS,
-      0.001, // 0 OCT amount
+      0, // 0 OCT amount
       balanceData.nonce + 1,
       request.privateKey,
       publicKeyHex, // Properly derived public key
@@ -66,7 +66,7 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
 
 export async function lookupDomain(domain: string): Promise<DomainLookupResult> {
   try {
-    const response = await fetch(`${DOMAIN_API_BACKEND}/api/domain/lookup/${domain}`);
+    const response = await fetch(`${DOMAIN_API_BACKEND}/lookup/${domain}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -88,7 +88,7 @@ export async function lookupDomain(domain: string): Promise<DomainLookupResult> 
 
 export async function lookupAddress(address: string): Promise<DomainLookupResult> {
   try {
-    const response = await fetch(`${DOMAIN_API_BACKEND}/api/domain/reverse/${address}`);
+    const response = await fetch(`${DOMAIN_API_BACKEND}/reverse/${address}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -110,7 +110,7 @@ export async function lookupAddress(address: string): Promise<DomainLookupResult
 
 async function storeDomainRegistration(registration: any): Promise<void> {
   try {
-    const response = await fetch(`${DOMAIN_API_BACKEND}/api/domain/register`, {
+    const response = await fetch(`${DOMAIN_API_BACKEND}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
