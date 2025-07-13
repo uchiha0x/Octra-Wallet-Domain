@@ -1,5 +1,7 @@
 import { DomainRegistrationRequest, DomainRegistrationResult, DomainLookupResult } from '../types/domain';
 import { createTransaction, sendTransaction, fetchBalance } from './api';
+import * as nacl from 'tweetnacl';
+import { base64ToBuffer, bufferToHex } from './crypto';
 
 // Get domain master address from environment variables
 const DOMAIN_MASTER_ADDRESS = import.meta.env.VITE_DOMAIN_MASTER_ADDRESS || 'oct8UYokvM1DR2QpTD4mncgvRzfM6f9yDuRR1gmBASgTk8d';
@@ -21,6 +23,11 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
     // Get current nonce
     const balanceData = await fetchBalance(request.ownerAddress);
     
+    // Derive public key from private key
+    const privateKeyBuffer = base64ToBuffer(request.privateKey);
+    const keyPair = nacl.sign.keyPair.fromSeed(privateKeyBuffer);
+    const publicKeyHex = bufferToHex(Buffer.from(keyPair.publicKey));
+    
     // Create registration message
     const registrationMessage = `register_domain:${request.domain}`;
     
@@ -31,7 +38,7 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
       0.001, // 0 OCT amount
       balanceData.nonce + 1,
       request.privateKey,
-      '', // Will be derived from private key
+      publicKeyHex, // Properly derived public key
       registrationMessage
     );
 
