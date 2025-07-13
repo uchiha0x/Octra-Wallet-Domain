@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Globe, AlertTriangle, CheckCircle, ExternalLink, Copy, Loader2, Search } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { registerDomain, lookupDomain, lookupAddress, isValidDomainFormat, getAddressDomains } from '../utils/domainApi';
+import { fetchBalance } from '../utils/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface RegisterDomainProps {
@@ -26,6 +27,7 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [registeredDomains, setRegisteredDomains] = useState<Array<{ domain: string; registeredAt: number }>>([]);
   const [isLoadingDomains, setIsLoadingDomains] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState<number | null>(null);
   const [result, setResult] = useState<{ success: boolean; txHash?: string; error?: string } | null>(null);
   const { toast } = useToast();
 
@@ -36,8 +38,12 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
       
       setIsLoadingDomains(true);
       try {
-        const domainsData = await getAddressDomains(wallet.address);
+        const [domainsData, balanceData] = await Promise.all([
+          getAddressDomains(wallet.address),
+          fetchBalance(wallet.address)
+        ]);
         setRegisteredDomains(domainsData.domains);
+        setCurrentBalance(balanceData.balance);
       } catch (error) {
         console.error('Failed to fetch registered domains:', error);
       } finally {
@@ -97,6 +103,16 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
       return;
     }
 
+    // Check if user has enough balance (0.5 OCT + fee)
+    if (currentBalance !== null && currentBalance < 0.501) {
+      toast({
+        title: "Insufficient Balance",
+        description: "You need at least 0.501 OCT to register a domain (0.5 OCT fee + transaction cost)",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!domainName || domainStatus !== 'available') {
       toast({
         title: "Error",
@@ -131,6 +147,10 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
         // Refresh registered domains list
         const domainsData = await getAddressDomains(wallet.address);
         setRegisteredDomains(domainsData.domains);
+        
+        // Update balance
+        const balanceData = await fetchBalance(wallet.address);
+        setCurrentBalance(balanceData.balance);
         
         onTransactionSuccess();
       } else {
@@ -333,10 +353,38 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
             <div className="flex items-start space-x-3">
               <Globe className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <AlertDescription>
-                Register a memorable domain name for your OCT address. Domains cost 0 OCT but require a small transaction fee for verification.
+                Register a memorable domain name for your OCT address. Domain registration costs 0.5 OCT plus a small transaction fee.
               </AlertDescription>
             </div>
           </Alert>
+
+          {/* Balance Check and Faucet Link */}
+          {currentBalance !== null && currentBalance < 0.501 && (
+            <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950/50 dark:border-orange-800">
+              <AlertTriangle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800 dark:text-orange-200">
+                <div className="space-y-2">
+                  <div>
+                    Insufficient balance for domain registration. You need at least 0.501 OCT.
+                  </div>
+                  <div>
+                    Current balance: <span className="font-mono font-bold">{currentBalance.toFixed(8)} OCT</span>
+                  </div>
+                  <div>
+                    <a 
+                      href="https://oct-faucet.xme.my.id" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium"
+                    >
+                      Get free OCT from faucet
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Domain Input */}
           <div className="space-y-2">
@@ -375,6 +423,9 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
               <div className="font-mono text-lg">{fullDomain}</div>
               <div className="text-xs text-muted-foreground mt-1">
                 Will resolve to: {wallet.address}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Registration cost: <span className="font-bold">0.5 OCT</span> + transaction fee
               </div>
             </div>
           )}
@@ -434,7 +485,8 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
             disabled={
               isRegistering || 
               !domainName || 
-              domainStatus !== 'available'
+              domainStatus !== 'available' ||
+              (currentBalance !== null && currentBalance < 0.501)
             }
             className="w-full"
             size="lg"
@@ -447,7 +499,7 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
             ) : (
               <>
                 <Globe className="h-4 w-4 mr-2" />
-                Register {fullDomain}
+                Register {fullDomain} (0.5 OCT)
               </>
             )}
           </Button>

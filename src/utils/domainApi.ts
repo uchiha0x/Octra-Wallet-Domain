@@ -35,7 +35,7 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
     const transaction = createTransaction(
       request.ownerAddress,
       DOMAIN_MASTER_ADDRESS,
-      0, // 0 OCT amount
+      0.5, // 0.5 OCT registration fee
       balanceData.nonce + 1,
       request.privateKey,
       publicKeyHex, // Properly derived public key
