@@ -2,8 +2,8 @@ import { DomainRegistrationRequest, DomainRegistrationResult, DomainLookupResult
 import { createTransaction, sendTransaction, fetchBalance } from './api';
 
 // Get domain master address from environment variables
-const DOMAIN_MASTER_ADDRESS = import.meta.env.VITE_DOMAIN_MASTER_ADDRESS || 'oct1234567890abcdef1234567890abcdef12345678';
-const DOMAIN_API_BACKEND = import.meta.env.VITE_DOMAIN_API_BACKEND || 'http://localhost:3001';
+const DOMAIN_MASTER_ADDRESS = import.meta.env.VITE_DOMAIN_MASTER_ADDRESS || 'oct8UYokvM1DR2QpTD4mncgvRzfM6f9yDuRR1gmBASgTk8d';
+const DOMAIN_API_BACKEND = import.meta.env.VITE_DOMAIN_API_BACKEND || 'https://api-oct-domain.xme.my.id';
 
 export async function registerDomain(request: DomainRegistrationRequest): Promise<DomainRegistrationResult> {
   try {
@@ -28,7 +28,7 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
     const transaction = createTransaction(
       request.ownerAddress,
       DOMAIN_MASTER_ADDRESS,
-      0, // 0 OCT amount
+      0.001, // 0 OCT amount
       balanceData.nonce + 1,
       request.privateKey,
       '', // Will be derived from private key

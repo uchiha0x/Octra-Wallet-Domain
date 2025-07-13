@@ -1,7 +1,7 @@
 const { fetchTransactionDetails } = require('./octraApi');
 
 // Get domain master address from environment variables
-const DOMAIN_MASTER_ADDRESS = process.env.DOMAIN_MASTER_ADDRESS || 'oct1234567890abcdef1234567890abcdef12345678';
+const DOMAIN_MASTER_ADDRESS = process.env.DOMAIN_MASTER_ADDRESS || 'oct8UYokvM1DR2QpTD4mncgvRzfM6f9yDuRR1gmBASgTk8d';
 
 // Validate domain format
 function validateDomain(domain) {
