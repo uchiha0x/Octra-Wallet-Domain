@@ -234,10 +234,12 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
         </CardHeader>
         <CardContent className="space-y-6">
           <Alert>
-            <Globe className="h-4 w-4" />
-            <AlertDescription>
-              Register a memorable domain name for your OCT address. Domains cost 0 OCT but require a small transaction fee for verification.
-            </AlertDescription>
+            <div className="flex items-start space-x-3">
+              <Globe className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <AlertDescription>
+                Register a memorable domain name for your OCT address. Domains cost 0 OCT but require a small transaction fee for verification.
+              </AlertDescription>
+            </div>
           </Alert>
 
           {/* Domain Input */}
