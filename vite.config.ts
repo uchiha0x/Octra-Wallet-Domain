@@ -37,7 +37,7 @@ export default defineConfig({
       },
       // Separate proxy for domain API if needed
       '/domain-api': {
-        target: process.env.VITE_DOMAIN_API_BACKEND || 'http://localhost:3001',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/domain-api/, '/api'),
         secure: false,
