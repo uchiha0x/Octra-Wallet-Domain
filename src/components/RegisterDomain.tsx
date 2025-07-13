@@ -298,10 +298,12 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
             </div>
           ) : registeredDomains.length === 0 ? (
             <Alert>
-              <Globe className="h-4 w-4" />
-              <AlertDescription>
-                You haven't registered any domains yet. Register your first domain below!
-              </AlertDescription>
+              <div className="flex items-start space-x-3">
+                <Globe className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <AlertDescription>
+                  You haven't registered any domains yet. Register your first domain below!
+                </AlertDescription>
+              </div>
             </Alert>
           ) : (
             <div className="space-y-3">
