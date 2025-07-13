@@ -16,6 +16,7 @@ import {
   PieChart,
   Shield,
   Gift,
+  Globe,
   ChevronDown,
   Plus,
   Trash2,
