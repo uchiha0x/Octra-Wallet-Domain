@@ -8,7 +8,7 @@ const domainRoutes = require('./routes/domains');
 const { initDatabase } = require('./database/init');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Security middleware
 app.use(helmet());
@@ -26,7 +26,7 @@ app.use(limiter);
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:5173', 'http://localhost:3000','https://octra.xme.my.id','https://api-oct-domain.xme.my.id'];
+  : ['http://localhost:5173', 'http://localhost:3002','https://octra.xme.my.id','https://api-oct-domain.xme.my.id'];
 
 app.use(cors({
   origin: function (origin, callback) {
