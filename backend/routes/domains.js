@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDatabase } = require('../database/init');
+const { getDatabase, closeDatabase } = require('../database/init');
 const { validateDomain, verifyTransaction, isValidOctAddress } = require('../utils/validation');
 const { fetchTransactionDetails } = require('../utils/octraApi');
 
@@ -10,6 +10,8 @@ router.post('/register', async (req, res) => {
   const { domain, address, txHash, registeredAt } = req.body;
   const clientIP = req.ip || req.connection.remoteAddress;
   const userAgent = req.get('User-Agent');
+
+  let db;
 
   try {
     // Validate input
@@ -33,7 +35,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const db = getDatabase();
+    db = getDatabase();
 
     // Check if domain already exists
     const existingDomain = await new Promise((resolve, reject) => {
@@ -48,7 +50,6 @@ router.post('/register', async (req, res) => {
     });
 
     if (existingDomain) {
-      db.close();
       return res.status(409).json({ 
         error: 'Domain already registered',
         registeredTo: existingDomain.address
@@ -93,8 +94,6 @@ router.post('/register', async (req, res) => {
       );
     });
 
-    db.close();
-
     res.status(201).json({
       success: true,
       message: 'Domain registered successfully',
@@ -110,12 +109,17 @@ router.post('/register', async (req, res) => {
       error: 'Failed to register domain',
       message: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  } finally {
+    if (db) {
+      closeDatabase(db);
+    }
   }
 });
 
 // Lookup domain to get address
 router.get('/lookup/:domain', async (req, res) => {
   const { domain } = req.params;
+  let db;
 
   try {
     if (!validateDomain(domain)) {
@@ -124,7 +128,7 @@ router.get('/lookup/:domain', async (req, res) => {
       });
     }
 
-    const db = getDatabase();
+    db = getDatabase();
 
     const result = await new Promise((resolve, reject) => {
       db.get(
@@ -136,8 +140,6 @@ router.get('/lookup/:domain', async (req, res) => {
         }
       );
     });
-
-    db.close();
 
     if (!result) {
       return res.status(404).json({ 
@@ -156,12 +158,17 @@ router.get('/lookup/:domain', async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to lookup domain' 
     });
+  } finally {
+    if (db) {
+      closeDatabase(db);
+    }
   }
 });
 
 // Reverse lookup - get domain from address
 router.get('/reverse/:address', async (req, res) => {
   const { address } = req.params;
+  let db;
 
   try {
     if (!isValidOctAddress(address)) {
@@ -170,7 +177,7 @@ router.get('/reverse/:address', async (req, res) => {
       });
     }
 
-    const db = getDatabase();
+    db = getDatabase();
 
     const result = await new Promise((resolve, reject) => {
       db.get(
@@ -182,8 +189,6 @@ router.get('/reverse/:address', async (req, res) => {
         }
       );
     });
-
-    db.close();
 
     if (!result) {
       return res.status(404).json({ 
@@ -202,12 +207,17 @@ router.get('/reverse/:address', async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to lookup address' 
     });
+  } finally {
+    if (db) {
+      closeDatabase(db);
+    }
   }
 });
 
 // Get all domains for an address
 router.get('/address/:address/domains', async (req, res) => {
   const { address } = req.params;
+  let db;
 
   try {
     if (!isValidOctAddress(address)) {
@@ -216,7 +226,7 @@ router.get('/address/:address/domains', async (req, res) => {
       });
     }
 
-    const db = getDatabase();
+    db = getDatabase();
 
     const results = await new Promise((resolve, reject) => {
       db.all(
@@ -228,8 +238,6 @@ router.get('/address/:address/domains', async (req, res) => {
         }
       );
     });
-
-    db.close();
 
     res.json({
       address,
@@ -245,13 +253,19 @@ router.get('/address/:address/domains', async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to lookup domains for address' 
     });
+  } finally {
+    if (db) {
+      closeDatabase(db);
+    }
   }
 });
 
 // Get domain statistics
 router.get('/stats', async (req, res) => {
+  let db;
+
   try {
-    const db = getDatabase();
+    db = getDatabase();
 
     const stats = await new Promise((resolve, reject) => {
       db.get(
@@ -278,8 +292,6 @@ router.get('/stats', async (req, res) => {
       );
     });
 
-    db.close();
-
     res.json({
       totalDomains: stats.total_domains,
       uniqueAddresses: stats.unique_addresses,
@@ -296,6 +308,10 @@ router.get('/stats', async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to get statistics' 
     });
+  } finally {
+    if (db) {
+      closeDatabase(db);
+    }
   }
 });
 

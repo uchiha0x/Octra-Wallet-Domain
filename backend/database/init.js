@@ -1,20 +1,28 @@
-// backend/database/init.js
-
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-const dbFile = path.join(__dirname, '../database/database.sqlite');
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'domains.db');
+
+// Ensure database directory exists
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 
 const initDatabase = () => {
   return new Promise((resolve, reject) => {
-    if (!fs.existsSync(path.dirname(dbFile))) {
-      fs.mkdirSync(path.dirname(dbFile), { recursive: true });
-    }
-
-    const db = new sqlite3.Database(dbFile);
+    const db = new sqlite3.Database(dbPath, (err) => {
+      if (err) {
+        console.error('Error opening database:', err);
+        reject(err);
+        return;
+      }
+      console.log('Connected to SQLite database at:', dbPath);
+    });
 
     db.serialize(() => {
+      // Create domains table
       db.run(`
         CREATE TABLE IF NOT EXISTS domains (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,8 +34,15 @@ const initDatabase = () => {
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           status TEXT DEFAULT 'active'
         );
-      `);
+      `, (err) => {
+        if (err) {
+          console.error('Error creating domains table:', err);
+          reject(err);
+          return;
+        }
+      });
 
+      // Create registration_logs table
       db.run(`
         CREATE TABLE IF NOT EXISTS registration_logs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,13 +55,50 @@ const initDatabase = () => {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
       `, (err) => {
-        if (err) reject(err);
-        else resolve();
+        if (err) {
+          console.error('Error creating registration_logs table:', err);
+          reject(err);
+          return;
+        }
+        
+        console.log('Database tables created successfully');
+        db.close((err) => {
+          if (err) {
+            console.error('Error closing database:', err);
+            reject(err);
+          } else {
+            console.log('Database initialization completed');
+            resolve();
+          }
+        });
       });
     });
-
-    db.close();
   });
 };
 
-module.exports = { initDatabase };
+// Function to get a new database connection
+const getDatabase = () => {
+  return new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+      console.error('Error opening database connection:', err);
+      throw err;
+    }
+  });
+};
+
+// Function to close database connection
+const closeDatabase = (db) => {
+  if (db) {
+    db.close((err) => {
+      if (err) {
+        console.error('Error closing database:', err);
+      }
+    });
+  }
+};
+
+module.exports = { 
+  initDatabase, 
+  getDatabase, 
+  closeDatabase 
+};
