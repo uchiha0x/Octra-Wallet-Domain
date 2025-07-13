@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Send, AlertTriangle, Wallet as WalletIcon, CheckCircle, ExternalLink, Copy, MessageSquare, Calculator } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, sendTransaction, createTransaction } from '../utils/api';
+import { resolveAddressOrDomain } from '../utils/domainApi';
+import { AddressInput } from './AddressInput';
 import { useToast } from '@/hooks/use-toast';
 
 interface SendTransactionProps {
@@ -23,6 +25,7 @@ interface SendTransactionProps {
 
 export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNonceUpdate, onTransactionSuccess }: SendTransactionProps) {
   const [recipientAddress, setRecipientAddress] = useState('');
+  const [resolvedRecipientAddress, setResolvedRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -71,7 +74,10 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
       return;
     }
 
-    if (!validateAddress(recipientAddress)) {
+    // Use resolved address if available, otherwise use input
+    const finalRecipientAddress = resolvedRecipientAddress || recipientAddress;
+    
+    if (!validateAddress(finalRecipientAddress)) {
       toast({
         title: "Error",
         description: "Invalid recipient address",
@@ -122,7 +128,7 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
 
       const transaction = createTransaction(
         wallet.address,
-        recipientAddress,
+        finalRecipientAddress,
         amountNum,
         currentNonce + 1,
         wallet.privateKey,
@@ -238,16 +244,12 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
         {/* Recipient Address */}
         <div className="space-y-2">
           <Label htmlFor="recipient">Recipient Address</Label>
-          <Input
-            id="recipient"
-            placeholder="oct..."
+          <AddressInput
             value={recipientAddress}
-            onChange={(e) => setRecipientAddress(e.target.value)}
-            className="font-mono"
+            onChange={setRecipientAddress}
+            onResolvedAddress={setResolvedRecipientAddress}
+            placeholder="oct... or domain.oct"
           />
-          {recipientAddress && !validateAddress(recipientAddress) && (
-            <p className="text-sm text-red-600">Invalid address format</p>
-          )}
         </div>
 
         {/* Amount */}
@@ -375,7 +377,7 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
           onClick={handleSend}
           disabled={
             isSending || 
-            !validateAddress(recipientAddress) || 
+            !validateAddress(resolvedRecipientAddress || recipientAddress) || 
             !validateAmount(amount) || 
             totalCost > currentBalance ||
             Boolean(message && message.length > 1024)
