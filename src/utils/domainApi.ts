@@ -108,6 +108,25 @@ export async function lookupAddress(address: string): Promise<DomainLookupResult
   }
 }
 
+export async function getAddressDomains(address: string): Promise<{ domains: Array<{ domain: string; registeredAt: number }>, count: number }> {
+  try {
+    const response = await fetch(`${DOMAIN_API_BACKEND}/address/${address}/domains`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        domains: data.domains || [],
+        count: data.count || 0
+      };
+    } else {
+      return { domains: [], count: 0 };
+    }
+  } catch (error) {
+    console.error('Error fetching address domains:', error);
+    return { domains: [], count: 0 };
+  }
+}
+
 async function storeDomainRegistration(registration: any): Promise<void> {
   try {
     const response = await fetch(`${DOMAIN_API_BACKEND}/register`, {

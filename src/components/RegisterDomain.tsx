@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Globe, AlertTriangle, CheckCircle, ExternalLink, Copy, Loader2, Search } from 'lucide-react';
 import { Wallet } from '../types/wallet';
-import { registerDomain, lookupDomain, lookupAddress, isValidDomainFormat } from '../utils/domainApi';
+import { registerDomain, lookupDomain, lookupAddress, isValidDomainFormat, getAddressDomains } from '../utils/domainApi';
 import { useToast } from '@/hooks/use-toast';
 
 interface RegisterDomainProps {
@@ -24,8 +24,29 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
   const [lookupInput, setLookupInput] = useState('');
   const [lookupResult, setLookupResult] = useState<any>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const [registeredDomains, setRegisteredDomains] = useState<Array<{ domain: string; registeredAt: number }>>([]);
+  const [isLoadingDomains, setIsLoadingDomains] = useState(false);
   const [result, setResult] = useState<{ success: boolean; txHash?: string; error?: string } | null>(null);
   const { toast } = useToast();
+
+  // Fetch registered domains when wallet changes
+  useEffect(() => {
+    const fetchRegisteredDomains = async () => {
+      if (!wallet) return;
+      
+      setIsLoadingDomains(true);
+      try {
+        const domainsData = await getAddressDomains(wallet.address);
+        setRegisteredDomains(domainsData.domains);
+      } catch (error) {
+        console.error('Failed to fetch registered domains:', error);
+      } finally {
+        setIsLoadingDomains(false);
+      }
+    };
+
+    fetchRegisteredDomains();
+  }, [wallet]);
 
   const fullDomain = domainName ? `${domainName}.oct` : '';
 
@@ -106,6 +127,10 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
         // Reset form
         setDomainName('');
         setDomainStatus(null);
+        
+        // Refresh registered domains list
+        const domainsData = await getAddressDomains(wallet.address);
+        setRegisteredDomains(domainsData.domains);
         
         onTransactionSuccess();
       } else {
@@ -224,6 +249,77 @@ export function RegisterDomain({ wallet, onTransactionSuccess }: RegisterDomainP
 
   return (
     <div className="space-y-6">
+      {/* Registered Domains List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            My Registered Domains
+            {registeredDomains.length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {registeredDomains.length}
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoadingDomains ? (
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground">Loading your domains...</div>
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-muted rounded w-32 animate-pulse"></div>
+                    <div className="h-3 bg-muted rounded w-24 animate-pulse"></div>
+                  </div>
+                  <div className="h-8 bg-muted rounded w-16 animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          ) : registeredDomains.length === 0 ? (
+            <Alert>
+              <Globe className="h-4 w-4" />
+              <AlertDescription>
+                You haven't registered any domains yet. Register your first domain below!
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground">
+                You have {registeredDomains.length} registered domain{registeredDomains.length !== 1 ? 's' : ''}
+              </div>
+              
+              {registeredDomains.map((domainData, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="space-y-1">
+                    <div className="font-mono font-medium text-lg">
+                      {domainData.domain}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Registered: {new Date(domainData.registeredAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Badge variant="default" className="text-xs">
+                      Active
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(domainData.domain, 'Domain')}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Domain Registration */}
       <Card>
         <CardHeader>
