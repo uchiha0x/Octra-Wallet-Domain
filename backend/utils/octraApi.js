@@ -127,7 +127,7 @@ async function verifyDomainRegistration(txHash, fromAddress, domain) {
     const checks = {
       fromAddress: txDetails.parsed_tx.from === fromAddress,
       toAddress: txDetails.parsed_tx.to === masterAddress,
-      amount: parseFloat(txDetails.parsed_tx.amount) === 0,
+      amount: parseFloat(txDetails.parsed_tx.amount) === 0.5, // 0.5 OCT registration fee
       message: txDetails.parsed_tx.message === expectedMessage
     };
 
@@ -140,7 +140,7 @@ async function verifyDomainRegistration(txHash, fromAddress, domain) {
       expected: {
         from: fromAddress,
         to: masterAddress,
-        amount: 0,
+        amount: 0.5,
         message: expectedMessage
       }
     };

@@ -60,7 +60,7 @@ async function verifyTransaction(txHash, fromAddress, domain) {
     const isValidTx = (
       txDetails.parsed_tx.from === fromAddress &&
       txDetails.parsed_tx.to === masterAddress &&
-      parseFloat(txDetails.parsed_tx.amount) === 0 &&
+      parseFloat(txDetails.parsed_tx.amount) === 0.5 && // 0.5 OCT registration fee
       txDetails.parsed_tx.message === `register_domain:${domain.toLowerCase()}`
     );
 
@@ -69,7 +69,7 @@ async function verifyTransaction(txHash, fromAddress, domain) {
         expected: {
           from: fromAddress,
           to: masterAddress,
-          amount: 0,
+          amount: 0.5,
           message: `register_domain:${domain.toLowerCase()}`
         },
         actual: {
