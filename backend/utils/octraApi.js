@@ -91,10 +91,10 @@ async function checkStagingTransaction(txHash) {
 
 // Verify domain registration transaction
 async function verifyDomainRegistration(txHash, fromAddress, domain) {
-  const masterAddress = process.env.MASTER_WALLET_ADDRESS;
+  const masterAddress = process.env.DOMAIN_MASTER_ADDRESS || process.env.MASTER_WALLET_ADDRESS;
   
   if (!masterAddress) {
-    console.warn('MASTER_WALLET_ADDRESS not configured');
+    console.warn('DOMAIN_MASTER_ADDRESS not configured');
     return { valid: false, reason: 'Master address not configured' };
   }
 

@@ -1,8 +1,9 @@
 import { DomainRegistrationRequest, DomainRegistrationResult, DomainLookupResult } from '../types/domain';
 import { createTransaction, sendTransaction, fetchBalance } from './api';
 
-// Master wallet address for domain registration verification
-const DOMAIN_MASTER_ADDRESS = 'oct1234567890abcdef1234567890abcdef12345678'; // Replace with actual master address
+// Get domain master address from environment variables
+const DOMAIN_MASTER_ADDRESS = import.meta.env.VITE_DOMAIN_MASTER_ADDRESS || 'oct1234567890abcdef1234567890abcdef12345678';
+const DOMAIN_API_BACKEND = import.meta.env.VITE_DOMAIN_API_BACKEND || 'http://localhost:3001';
 
 export async function registerDomain(request: DomainRegistrationRequest): Promise<DomainRegistrationResult> {
   try {
@@ -58,7 +59,7 @@ export async function registerDomain(request: DomainRegistrationRequest): Promis
 
 export async function lookupDomain(domain: string): Promise<DomainLookupResult> {
   try {
-    const response = await fetch(`/api/domain/lookup/${domain}`);
+    const response = await fetch(`${DOMAIN_API_BACKEND}/api/domain/lookup/${domain}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -80,7 +81,7 @@ export async function lookupDomain(domain: string): Promise<DomainLookupResult> 
 
 export async function lookupAddress(address: string): Promise<DomainLookupResult> {
   try {
-    const response = await fetch(`/api/domain/reverse/${address}`);
+    const response = await fetch(`${DOMAIN_API_BACKEND}/api/domain/reverse/${address}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -102,7 +103,7 @@ export async function lookupAddress(address: string): Promise<DomainLookupResult
 
 async function storeDomainRegistration(registration: any): Promise<void> {
   try {
-    const response = await fetch('/api/domain/register', {
+    const response = await fetch(`${DOMAIN_API_BACKEND}/api/domain/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

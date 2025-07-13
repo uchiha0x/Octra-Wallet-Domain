@@ -35,6 +35,13 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ''), // Removes '/api' prefix when forwarding
         secure: true, // If the target is HTTPS (recommended)
       },
+      // Separate proxy for domain API if needed
+      '/domain-api': {
+        target: process.env.VITE_DOMAIN_API_BACKEND || 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/domain-api/, '/api'),
+        secure: false,
+      },
     },
   },
 });

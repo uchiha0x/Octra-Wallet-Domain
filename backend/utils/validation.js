@@ -1,5 +1,8 @@
 const { fetchTransactionDetails } = require('./octraApi');
 
+// Get domain master address from environment variables
+const DOMAIN_MASTER_ADDRESS = process.env.DOMAIN_MASTER_ADDRESS || 'oct1234567890abcdef1234567890abcdef12345678';
+
 // Validate domain format
 function validateDomain(domain) {
   if (!domain || typeof domain !== 'string') {
@@ -39,9 +42,9 @@ function isValidOctAddress(address) {
 // Verify transaction on blockchain
 async function verifyTransaction(txHash, fromAddress, domain) {
   try {
-    const masterAddress = process.env.MASTER_WALLET_ADDRESS;
+    const masterAddress = DOMAIN_MASTER_ADDRESS;
     if (!masterAddress) {
-      console.warn('MASTER_WALLET_ADDRESS not configured, skipping verification');
+      console.warn('DOMAIN_MASTER_ADDRESS not configured, skipping verification');
       return true; // Skip verification if not configured
     }
 
