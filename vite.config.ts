@@ -43,7 +43,7 @@ export default defineConfig({
       //   secure: false,
       // },
       '/domain-api': {
-        target: 'http://localhost:3001',
+        target: 'https://api-oct-domain.xme.my.id',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/domain-api/, ''), // jangan tambah /api
         secure: false,
