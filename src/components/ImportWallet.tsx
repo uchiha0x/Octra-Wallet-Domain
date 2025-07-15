@@ -108,9 +108,7 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1">
-        <div className="space-y-4 pr-4 pb-4">
+    <div className="space-y-4">
       <Alert>
         <div className="flex items-start space-x-3">
           <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -198,8 +196,6 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
           </Button>
         </TabsContent>
       </Tabs>
-        </div>
-      </ScrollArea>
     </div>
   );
 }

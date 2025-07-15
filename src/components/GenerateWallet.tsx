@@ -108,9 +108,7 @@ export function GenerateWallet({ onWalletGenerated }: GenerateWalletProps) {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1">
-        <div className="space-y-4 pr-4 pb-4">
+    <div className="space-y-4">
       <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
         <div className="flex items-start space-x-3">
           <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" />
@@ -227,8 +225,6 @@ export function GenerateWallet({ onWalletGenerated }: GenerateWalletProps) {
           </Button>
         </div>
       </div>
-        </div>
-      </ScrollArea>
     </div>
   );
 }

@@ -379,7 +379,8 @@ export function WalletDashboard({
                   <DialogHeader>
                     <DialogTitle>Add New Wallet</DialogTitle>
                   </DialogHeader>
-                  <div className="flex-1 overflow-hidden">
+                  <ScrollArea className="flex-1 max-h-[70vh]">
+                    <div className="pr-4">
                     <Tabs value={addWalletTab} onValueChange={setAddWalletTab} className="w-full h-full flex flex-col">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="import" className="flex items-center gap-2">
@@ -392,15 +393,16 @@ export function WalletDashboard({
                       </TabsTrigger>
                     </TabsList>
                     
-                    <TabsContent value="import" className="mt-4 flex-1 min-h-0">
+                    <TabsContent value="import" className="mt-4">
                       <ImportWallet onWalletImported={handleImportSuccess} />
                     </TabsContent>
                     
-                    <TabsContent value="generate" className="mt-4 flex-1 min-h-0">
+                    <TabsContent value="generate" className="mt-4">
                       <GenerateWallet onWalletGenerated={handleGenerateSuccess} />
                     </TabsContent>
                   </Tabs>
-                  </div>
+                    </div>
+                  </ScrollArea>
                 </DialogContent>
               </Dialog>
               <Dialog open={showRPCManager} onOpenChange={setShowRPCManager}>
