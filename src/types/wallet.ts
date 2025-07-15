@@ -138,3 +138,38 @@ export interface ClaimResult {
   amount?: string;
   error?: string;
 }
+
+// Password protection types
+export interface WalletPassword {
+  hashedPassword: string;
+  salt: string;
+}
+
+// RPC Provider types
+export interface RPCProvider {
+  id: string;
+  name: string;
+  url: string;
+  headers: Record<string, string>;
+  priority: number;
+  isActive: boolean;
+  createdAt: number;
+}
+
+// dApp connection types
+export interface DAppConnectionRequest {
+  origin: string;
+  successUrl: string;
+  failureUrl: string;
+  permissions: string[];
+  appName?: string;
+  appIcon?: string;
+}
+
+export interface ConnectedDApp {
+  origin: string;
+  appName: string;
+  connectedAt: number;
+  permissions: string[];
+  selectedAddress: string;
+}

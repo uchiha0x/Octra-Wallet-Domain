@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Wallet as WalletIcon, 
   Send, 
@@ -20,7 +21,9 @@ import {
   ChevronDown,
   Plus,
   Trash2,
-  Check
+  Check,
+  Wifi,
+  Download
 } from 'lucide-react';
 import { Balance } from './Balance';
 import { MultiSend } from './MultiSend';
@@ -30,6 +33,8 @@ import { ClaimTransfers } from './ClaimTransfers';
 import { TxHistory } from './TxHistory';
 import { ThemeToggle } from './ThemeToggle';
 import { ImportWallet } from './ImportWallet';
+import { GenerateWallet } from './GenerateWallet';
+import { RPCProviderManager } from './RPCProviderManager';
 import { RegisterDomain } from './RegisterDomain';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, getTransactionHistory } from '../utils/api';
@@ -69,6 +74,9 @@ export function WalletDashboard({
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true);
   const [nonce, setNonce] = useState(0);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showAddWalletDialog, setShowAddWalletDialog] = useState(false);
+  const [showRPCManager, setShowRPCManager] = useState(false);
+  const [addWalletTab, setAddWalletTab] = useState('import');
   const { toast } = useToast();
 
   // Initial data fetch when wallet is connected
@@ -163,12 +171,22 @@ export function WalletDashboard({
 
   const handleImportSuccess = (newWallet: Wallet) => {
     onAddWallet(newWallet);
-    setShowImportDialog(false);
+    setShowAddWalletDialog(false);
     toast({
       title: "Wallet Added",
       description: "New wallet has been added successfully",
     });
   };
+
+  const handleGenerateSuccess = (newWallet: Wallet) => {
+    onAddWallet(newWallet);
+    setShowAddWalletDialog(false);
+    toast({
+      title: "Wallet Generated",
+      description: "New wallet has been generated and added successfully",
+    });
+  };
+
   const handleBalanceUpdate = async (newBalance: number) => {
     setBalance(newBalance);
     // Also refresh nonce when balance is updated
@@ -342,7 +360,16 @@ export function WalletDashboard({
 
             <div className="flex items-center space-x-2">
               <ThemeToggle />
-              <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRPCManager(true)}
+                className="flex items-center gap-2"
+              >
+                <Wifi className="h-4 w-4" />
+                <span className="hidden sm:inline">RPC</span>
+              </Button>
+              <Dialog open={showAddWalletDialog} onOpenChange={setShowAddWalletDialog}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
@@ -351,9 +378,33 @@ export function WalletDashboard({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Import Additional Wallet</DialogTitle>
+                    <DialogTitle>Add New Wallet</DialogTitle>
                   </DialogHeader>
-                  <ImportWallet onWalletImported={handleImportSuccess} />
+                  <Tabs value={addWalletTab} onValueChange={setAddWalletTab} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="import" className="flex items-center gap-2">
+                        <Download className="h-4 w-4" />
+                        onClick={() => setShowAddWalletDialog(true)}
+                      </TabsTrigger>
+                      <TabsTrigger value="generate" className="flex items-center gap-2">
+                        <Plus className="h-4 w-4" />
+                        Generate
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="import" className="mt-6">
+                      <ImportWallet onWalletImported={handleImportSuccess} />
+                    </TabsContent>
+                    
+                    <TabsContent value="generate" className="mt-6">
+                      <GenerateWallet onWalletGenerated={handleGenerateSuccess} />
+                    </TabsContent>
+                  </Tabs>
+                </DialogContent>
+              </Dialog>
+              <Dialog open={showRPCManager} onOpenChange={setShowRPCManager}>
+                <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <RPCProviderManager onClose={() => setShowRPCManager(false)} />
                 </DialogContent>
               </Dialog>
               <Button

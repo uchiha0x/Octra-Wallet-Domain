@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { GenerateWallet } from './GenerateWallet';
 import { ImportWallet } from './ImportWallet';
+import { PasswordSetup } from './PasswordSetup';
 import { Wallet as WalletIcon, Plus, Download, Info } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 
@@ -14,6 +15,8 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onWalletCreated }: WelcomeScreenProps) {
   const [activeTab, setActiveTab] = useState<string>('generate');
+  const [pendingWallet, setPendingWallet] = useState<Wallet | null>(null);
+  const [showPasswordSetup, setShowPasswordSetup] = useState(false);
   
   // Check if there are existing wallets
   const hasExistingWallets = () => {
@@ -21,6 +24,33 @@ export function WelcomeScreen({ onWalletCreated }: WelcomeScreenProps) {
     return storedWallets && JSON.parse(storedWallets).length > 0;
   };
 
+  const handleWalletGenerated = (wallet: Wallet) => {
+    setPendingWallet(wallet);
+    setShowPasswordSetup(true);
+  };
+
+  const handlePasswordSet = (wallet: Wallet) => {
+    setShowPasswordSetup(false);
+    setPendingWallet(null);
+    onWalletCreated(wallet);
+  };
+
+  const handleBackToWalletCreation = () => {
+    setShowPasswordSetup(false);
+    setPendingWallet(null);
+  };
+
+  if (showPasswordSetup && pendingWallet) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <PasswordSetup
+          wallet={pendingWallet}
+          onPasswordSet={handlePasswordSet}
+          onBack={handleBackToWalletCreation}
+        />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-4xl">
@@ -78,7 +108,7 @@ export function WelcomeScreen({ onWalletCreated }: WelcomeScreenProps) {
                     Generate a brand new wallet with a secure mnemonic phrase
                   </p>
                 </div>
-                <GenerateWallet onWalletGenerated={onWalletCreated} />
+                <GenerateWallet onWalletGenerated={handleWalletGenerated} />
               </TabsContent>
 
               <TabsContent value="import" className="space-y-4">
@@ -88,7 +118,7 @@ export function WelcomeScreen({ onWalletCreated }: WelcomeScreenProps) {
                     Restore your wallet using a private key or mnemonic phrase
                   </p>
                 </div>
-                <ImportWallet onWalletImported={onWalletCreated} />
+                <ImportWallet onWalletImported={handleWalletGenerated} />
               </TabsContent>
             </Tabs>
           </CardContent>

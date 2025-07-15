@@ -1,15 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { WalletDashboard } from './components/WalletDashboard';
+import { UnlockWallet } from './components/UnlockWallet';
+import { DAppConnection } from './components/DAppConnection';
 import { ThemeProvider } from './components/ThemeProvider';
-import { Wallet } from './types/wallet';
+import { Wallet, DAppConnectionRequest } from './types/wallet';
 import { Toaster } from '@/components/ui/toaster';
 
 function App() {
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [isLocked, setIsLocked] = useState(false);
+  const [connectionRequest, setConnectionRequest] = useState<DAppConnectionRequest | null>(null);
+  const [selectedWalletForConnection, setSelectedWalletForConnection] = useState<Wallet | null>(null);
 
   useEffect(() => {
+    // Check if wallet is locked
+    const walletLocked = localStorage.getItem('isWalletLocked');
+    const hasPassword = localStorage.getItem('walletPasswordHash');
+    
+    if (hasPassword && walletLocked !== 'false') {
+      setIsLocked(true);
+      return;
+    }
+
+    // Check for dApp connection request in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const successUrl = urlParams.get('success_url');
+    const failureUrl = urlParams.get('failure_url');
+    const origin = urlParams.get('origin');
+    const appName = urlParams.get('app_name');
+    
+    if (successUrl && failureUrl && origin) {
+      setConnectionRequest({
+        origin: decodeURIComponent(origin),
+        successUrl: decodeURIComponent(successUrl),
+        failureUrl: decodeURIComponent(failureUrl),
+        permissions: ['view_address', 'view_balance', 'call_methods'],
+        appName: appName ? decodeURIComponent(appName) : undefined
+      });
+    }
+
     const storedWallets = localStorage.getItem('wallets');
     const activeWalletId = localStorage.getItem('activeWalletId');
     if (storedWallets) {
@@ -29,6 +60,54 @@ function App() {
       }
     }
   }, []);
+
+  const handleUnlock = (unlockedWallets: Wallet[]) => {
+    setWallets(unlockedWallets);
+    setIsLocked(false);
+    
+    // Set active wallet
+    if (unlockedWallets.length > 0) {
+      const activeWalletId = localStorage.getItem('activeWalletId');
+      let activeWallet = unlockedWallets[0];
+      if (activeWalletId) {
+        const foundWallet = unlockedWallets.find(w => w.address === activeWalletId);
+        if (foundWallet) {
+          activeWallet = foundWallet;
+        }
+      }
+      setWallet(activeWallet);
+    }
+  };
+
+  const handleConnectionApprove = (selectedWallet: Wallet) => {
+    if (!connectionRequest) return;
+    
+    // Store connection
+    const connections = JSON.parse(localStorage.getItem('connectedDApps') || '[]');
+    const newConnection = {
+      origin: connectionRequest.origin,
+      appName: connectionRequest.appName || connectionRequest.origin,
+      connectedAt: Date.now(),
+      permissions: connectionRequest.permissions,
+      selectedAddress: selectedWallet.address
+    };
+    connections.push(newConnection);
+    localStorage.setItem('connectedDApps', JSON.stringify(connections));
+    
+    // Redirect to success URL with wallet info
+    const successUrl = new URL(connectionRequest.successUrl);
+    successUrl.searchParams.set('account_id', selectedWallet.address);
+    successUrl.searchParams.set('public_key', selectedWallet.publicKey || '');
+    
+    window.location.href = successUrl.toString();
+  };
+
+  const handleConnectionReject = () => {
+    if (!connectionRequest) return;
+    
+    // Redirect to failure URL
+    window.location.href = connectionRequest.failureUrl;
+  };
 
   const addWallet = (newWallet: Wallet) => {
     // Check if wallet already exists
@@ -83,7 +162,42 @@ function App() {
       key: 'octra-wallet-theme',
       newValue: 'dark'
     }));
+    
+    // Lock wallet
+    localStorage.setItem('isWalletLocked', 'true');
+    setIsLocked(true);
   };
+
+  // Show unlock screen if wallet is locked
+  if (isLocked) {
+    return (
+      <ThemeProvider defaultTheme="dark" storageKey="octra-wallet-theme">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+          <UnlockWallet onUnlock={handleUnlock} />
+          <Toaster />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
+  // Show dApp connection screen if there's a connection request
+  if (connectionRequest && wallets.length > 0) {
+    return (
+      <ThemeProvider defaultTheme="dark" storageKey="octra-wallet-theme">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+          <DAppConnection
+            connectionRequest={connectionRequest}
+            wallets={wallets}
+            selectedWallet={selectedWalletForConnection}
+            onWalletSelect={setSelectedWalletForConnection}
+            onApprove={handleConnectionApprove}
+            onReject={handleConnectionReject}
+          />
+          <Toaster />
+        </div>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="octra-wallet-theme">
