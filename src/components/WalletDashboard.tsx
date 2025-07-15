@@ -325,7 +325,7 @@ export function WalletDashboard({
                         </div>
                         <DropdownMenuSeparator />
                         <div
-                          onClick={() => setShowImportDialog(true)}
+                          onClick={() => setShowAddWalletDialog(true)}
                           className="flex items-center justify-center space-x-2 p-3 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-sm mx-1 mb-1"
                         >
                           <Plus className="h-4 w-4" />
@@ -375,11 +375,12 @@ export function WalletDashboard({
                     <span className="hidden md:inline">Add Wallet</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
+                <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
                   <DialogHeader>
                     <DialogTitle>Add New Wallet</DialogTitle>
                   </DialogHeader>
-                  <Tabs value={addWalletTab} onValueChange={setAddWalletTab} className="w-full flex-1 flex flex-col overflow-hidden">
+                  <div className="flex-1 overflow-hidden">
+                    <Tabs value={addWalletTab} onValueChange={setAddWalletTab} className="w-full h-full flex flex-col">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="import" className="flex items-center gap-2">
                         <Download className="h-4 w-4" />
@@ -391,14 +392,15 @@ export function WalletDashboard({
                       </TabsTrigger>
                     </TabsList>
                     
-                    <TabsContent value="import" className="mt-4 flex-1 overflow-hidden">
+                    <TabsContent value="import" className="mt-4 flex-1 min-h-0">
                       <ImportWallet onWalletImported={handleImportSuccess} />
                     </TabsContent>
                     
-                    <TabsContent value="generate" className="mt-4 flex-1 overflow-hidden">
+                    <TabsContent value="generate" className="mt-4 flex-1 min-h-0">
                       <GenerateWallet onWalletGenerated={handleGenerateSuccess} />
                     </TabsContent>
                   </Tabs>
+                  </div>
                 </DialogContent>
               </Dialog>
               <Dialog open={showRPCManager} onOpenChange={setShowRPCManager}>

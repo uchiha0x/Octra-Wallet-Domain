@@ -108,9 +108,9 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <ScrollArea className="flex-1 pr-2">
-        <div className="space-y-4 pb-2">
+    <div className="h-full flex flex-col">
+      <ScrollArea className="flex-1">
+        <div className="space-y-4 pr-4 pb-4">
       <Alert>
         <div className="flex items-start space-x-3">
           <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
