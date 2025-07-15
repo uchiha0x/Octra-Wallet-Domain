@@ -110,124 +110,116 @@ export function GenerateWallet({ onWalletGenerated }: GenerateWalletProps) {
   return (
     <ScrollArea className="h-[70vh] pr-4">
       <div className="space-y-4">
-      <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
-        <div className="flex items-start space-x-3">
-          <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            Wallet generated successfully! Please backup the information below.
-          </AlertDescription>
-        </div>
-      </Alert>
-
-      {/* Wallet Address */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Wallet Address</label>
-        <div className="flex items-center space-x-2">
-          <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
-            {generatedWallet.address}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => copyToClipboard(generatedWallet.address, 'Address')}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Mnemonic */}
-      {generatedWallet.mnemonic && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Mnemonic Phrase</label>
-          <div className="p-4 bg-muted rounded-md">
-            <div className="grid grid-cols-3 gap-3">
-              {generatedWallet.mnemonic.split(' ').map((word, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Badge variant="outline" className="w-8 h-6 text-xs">
-                    {index + 1}
-                  </Badge>
-                  <span className="font-mono text-sm">{word}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => copyToClipboard(generatedWallet.mnemonic!, 'Mnemonic')}
-            className="w-full mt-2"
-          >
-            <Copy className="h-4 w-4 mr-2" />
-            Copy Mnemonic Phrase
-          </Button>
-        </div>
-      )}
-
-      {/* Private Key */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Private Key (Base64)</label>
-        <div className="flex items-center space-x-2">
-          <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
-            {generatedWallet.privateKey}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => copyToClipboard(generatedWallet.privateKey, 'Private Key')}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Backup Confirmation */}
-      <div className="space-y-4">
-        <Alert>
-            <div className="p-3 bg-muted rounded-md">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <AlertDescription>
-              Please confirm that you have securely backed up your wallet information.
-                    <Badge variant="outline" className="w-6 h-5 text-xs flex-shrink-0">
+        <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
+          <div className="flex items-start space-x-3">
+            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" />
+            <AlertDescription className="text-green-800 dark:text-green-200">
+              Wallet generated successfully! Please backup the information below.
             </AlertDescription>
           </div>
-                    <span className="font-mono text-xs sm:text-sm">{word}</span>
+        </Alert>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-            <div className="flex-1 p-3 bg-muted rounded-md font-mono text-xs sm:text-sm break-all">
-            onChange={(e) => setHasBackedUp(e.target.checked)}
-            className="rounded"
-              className="self-start sm:self-auto"
-          />
-          <label htmlFor="backup-confirm" className="text-sm">
-            I have securely backed up my wallet information
-          </label>
+        {/* Wallet Address */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Wallet Address</label>
+          <div className="flex items-center space-x-2">
+            <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
+              {generatedWallet.address}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => copyToClipboard(generatedWallet.address, 'Address')}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex space-x-3">
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-            variant="outline"
-            onClick={() => setGeneratedWallet(null)}
-          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-              className="w-full sm:flex-1"
-            Generate Another
-          </Button>
-          <Button 
-            onClick={handleSaveWallet}
-            disabled={!hasBackedUp}
-            className="flex-1"
-              className="w-full sm:flex-1"
-            size="lg"
-          >
-            Continue to Wallet
-          </Button>
+        {/* Mnemonic */}
+        {generatedWallet.mnemonic && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Mnemonic Phrase</label>
+            <div className="p-4 bg-muted rounded-md">
+              <div className="grid grid-cols-3 gap-3">
+                {generatedWallet.mnemonic.split(' ').map((word, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Badge variant="outline" className="w-8 h-6 text-xs">
+                      {index + 1}
+                    </Badge>
+                    <span className="font-mono text-sm">{word}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => copyToClipboard(generatedWallet.mnemonic!, 'Mnemonic')}
+              className="w-full mt-2"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Copy Mnemonic Phrase
+            </Button>
+          </div>
+        )}
+
+        {/* Private Key */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Private Key (Base64)</label>
+          <div className="flex items-center space-x-2">
+            <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
+              {generatedWallet.privateKey}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => copyToClipboard(generatedWallet.privateKey, 'Private Key')}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </div>
+
+        <Separator />
+
+        {/* Backup Confirmation */}
+        <div className="space-y-4">
+          <Alert>
+            <AlertDescription>
+              Please confirm that you have securely backed up your wallet information.
+            </AlertDescription>
+          </Alert>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              onChange={(e) => setHasBackedUp(e.target.checked)}
+              className="rounded"
+            />
+            <label htmlFor="backup-confirm" className="text-sm">
+              I have securely backed up my wallet information
+            </label>
+          </div>
+
+          <div className="flex space-x-3">
+            <Button
+              variant="outline"
+              onClick={() => setGeneratedWallet(null)}
+              className="w-full sm:flex-1"
+            >
+              Generate Another
+            </Button>
+            <Button 
+              onClick={handleSaveWallet}
+              disabled={!hasBackedUp}
+              className="flex-1"
+              size="lg"
+            >
+              Continue to Wallet
+            </Button>
+          </div>
+        </div>
       </div>
     </ScrollArea>
   );
