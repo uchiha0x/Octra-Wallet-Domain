@@ -383,7 +383,7 @@ export function WalletDashboard({
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="import" className="flex items-center gap-2">
                         <Download className="h-4 w-4" />
-                        onClick={() => setShowAddWalletDialog(true)}
+                        Import
                       </TabsTrigger>
                       <TabsTrigger value="generate" className="flex items-center gap-2">
                         <Plus className="h-4 w-4" />
@@ -403,6 +403,9 @@ export function WalletDashboard({
               </Dialog>
               <Dialog open={showRPCManager} onOpenChange={setShowRPCManager}>
                 <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>RPC Provider Management</DialogTitle>
+                  </DialogHeader>
                   <RPCProviderManager onClose={() => setShowRPCManager(false)} />
                 </DialogContent>
               </Dialog>
