@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Key, FileText, AlertTriangle, Loader2 } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { importWalletFromPrivateKey, importWalletFromMnemonic } from '../utils/wallet';
@@ -107,6 +108,7 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
   };
 
   return (
+    <ScrollArea className="h-[60vh] pr-4">
     <div className="space-y-4">
       <Alert>
         <div className="flex items-start space-x-3">
@@ -138,7 +140,7 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
               placeholder="Enter your private key (Base64 or Hex)"
               value={privateKey}
               onChange={(e) => setPrivateKey(e.target.value)}
-              className="font-mono"
+                className="font-mono text-sm"
             />
             <p className="text-sm text-muted-foreground">
               Enter your private key in Base64 or Hex format (with or without 0x prefix)
@@ -171,7 +173,7 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
               value={mnemonic}
               onChange={(e) => setMnemonic(e.target.value)}
               rows={4}
-              className="font-mono"
+                className="font-mono text-sm"
             />
             <p className="text-sm text-muted-foreground">
               Enter your mnemonic phrase separated by spaces (12 or 24 words)
@@ -196,5 +198,6 @@ export function ImportWallet({ onWalletImported }: ImportWalletProps) {
         </TabsContent>
       </Tabs>
     </div>
+    </ScrollArea>
   );
 }

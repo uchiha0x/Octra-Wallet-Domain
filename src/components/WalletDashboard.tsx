@@ -372,10 +372,10 @@ export function WalletDashboard({
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Add Wallet</span>
+                    <span className="hidden md:inline">Add Wallet</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden">
                   <DialogHeader>
                     <DialogTitle>Add New Wallet</DialogTitle>
                   </DialogHeader>
@@ -416,7 +416,7 @@ export function WalletDashboard({
                 className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Disconnect All</span>
+                <span className="hidden md:inline">Disconnect All</span>
               </Button>
             </div>
           </div>
