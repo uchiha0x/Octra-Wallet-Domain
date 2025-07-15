@@ -375,34 +375,38 @@ export function WalletDashboard({
                     <span className="hidden md:inline">Add Wallet</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden">
                   <DialogHeader>
                     <DialogTitle>Add New Wallet</DialogTitle>
                   </DialogHeader>
-                  <ScrollArea className="flex-1 max-h-[70vh]">
-                    <div className="pr-4">
-                    <Tabs value={addWalletTab} onValueChange={setAddWalletTab} className="w-full h-full flex flex-col">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="import" className="flex items-center gap-2">
-                        <Download className="h-4 w-4" />
-                        Import
-                      </TabsTrigger>
-                      <TabsTrigger value="generate" className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        Generate
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="import" className="mt-4">
-                      <ImportWallet onWalletImported={handleImportSuccess} />
-                    </TabsContent>
-                    
-                    <TabsContent value="generate" className="mt-4">
-                      <GenerateWallet onWalletGenerated={handleGenerateSuccess} />
-                    </TabsContent>
-                  </Tabs>
-                    </div>
-                  </ScrollArea>
+                  <div className="flex flex-col max-h-[calc(90vh-120px)]">
+                    <Tabs value={addWalletTab} onValueChange={setAddWalletTab} className="w-full flex flex-col">
+                      <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
+                        <TabsTrigger value="import" className="flex items-center gap-2">
+                          <Download className="h-4 w-4" />
+                          Import
+                        </TabsTrigger>
+                        <TabsTrigger value="generate" className="flex items-center gap-2">
+                          <Plus className="h-4 w-4" />
+                          Generate
+                        </TabsTrigger>
+                      </TabsList>
+                      
+                      <div className="flex-1 overflow-hidden">
+                        <ScrollArea className="h-full max-h-[calc(90vh-180px)]">
+                          <div className="pr-4">
+                            <TabsContent value="import" className="mt-4 data-[state=inactive]:hidden">
+                              <ImportWallet onWalletImported={handleImportSuccess} />
+                            </TabsContent>
+                            
+                            <TabsContent value="generate" className="mt-4 data-[state=inactive]:hidden">
+                              <GenerateWallet onWalletGenerated={handleGenerateSuccess} />
+                            </TabsContent>
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    </Tabs>
+                  </div>
                 </DialogContent>
               </Dialog>
               <Dialog open={showRPCManager} onOpenChange={setShowRPCManager}>
