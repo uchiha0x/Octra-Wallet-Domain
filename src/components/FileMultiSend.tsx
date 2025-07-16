@@ -106,12 +106,14 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
         } else {
           isValid = false;
         }
-        if (amountMode === 'different' && (!amount || isNaN(Number(amount)) || Number(amount) <= 0)) {
-          error = 'Invalid amount';
-          isValid = false;
-        }
       } else {
         error = 'Invalid address format';
+        isValid = false;
+      }
+
+      // Additional validation for different amount mode
+      if (amountMode === 'different' && (!amount || isNaN(Number(amount)) || Number(amount) <= 0)) {
+        error = 'Invalid amount';
         isValid = false;
       }
 
