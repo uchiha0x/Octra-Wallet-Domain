@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Upload, FileText, AlertTriangle, Wallet as WalletIcon, CheckCircle, ExternalLink, Copy, Zap, Trash2 } from 'lucide-react';
 import { Wallet } from '../types/wallet';
@@ -538,48 +539,52 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
                 Clear
               </Button>
             </div>
-
-            <div className="max-h-60 overflow-y-auto space-y-2">
-              {recipients.map((recipient, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg border ${
-                    recipient.isValid ? 'border-green-200 bg-green-50 dark:bg-green-950/50' : 'border-red-200 bg-red-50 dark:bg-red-950/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        {recipient.isValid ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <AlertTriangle className="h-4 w-4 text-red-600" />
-                        )}
-                        <span className="font-mono text-sm truncate">{recipient.address}</span>
-                      </div>
-                      {recipient.error && (
-                        <div className="text-xs text-red-600 mt-1">{recipient.error}</div>
-                      )}
-                      {recipient.resolvedAddress && recipient.resolvedAddress !== recipient.address && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Resolves to: {recipient.resolvedAddress}
+            <ScrollArea className="max-h-[calc(90vh-100px)] pr-2">
+              <div className="pr-2">
+                <div className="max-h-60 space-y-2">
+                  {recipients.map((recipient, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg border ${
+                        recipient.isValid ? 'border-green-200 bg-green-50 dark:bg-green-950/50' : 'border-red-200 bg-red-50 dark:bg-red-950/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            {recipient.isValid ? (
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <AlertTriangle className="h-4 w-4 text-red-600" />
+                            )}
+                            <span className="font-mono text-sm truncate">{recipient.address}</span>
+                          </div>
+                          {recipient.error && (
+                            <div className="text-xs text-red-600 mt-1">{recipient.error}</div>
+                          )}
+                          {recipient.resolvedAddress && recipient.resolvedAddress !== recipient.address && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Resolves to: {recipient.resolvedAddress}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="font-mono text-sm font-medium">
-                        {recipient.amount} OCT
-                      </div>
-                      {recipient.isValid && (
-                        <div className="text-xs text-muted-foreground">
-                          Fee: {calculateFee(Number(recipient.amount)).toFixed(3)} OCT
+                        <div className="text-right">
+                          <div className="font-mono text-sm font-medium">
+                            {recipient.amount} OCT
+                          </div>
+                          {recipient.isValid && (
+                            <div className="text-xs text-muted-foreground">
+                              Fee: {calculateFee(Number(recipient.amount)).toFixed(3)} OCT
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            </ScrollArea>
+
           </div>
         )}
 
