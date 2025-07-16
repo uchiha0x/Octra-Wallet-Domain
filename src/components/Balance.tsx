@@ -10,6 +10,7 @@ import { fetchBalance, fetchEncryptedBalance, encryptBalance, decryptBalance, ge
 import { useToast } from '@/hooks/use-toast';
 import { EncryptBalanceDialog } from './EncryptBalanceDialog';
 import { DecryptBalanceDialog } from './DecryptBalanceDialog';
+import { ExportPrivateKeys } from './ExportPrivateKeys';
 
 interface BalanceProps {
   wallet: WalletType | null;
@@ -215,107 +216,8 @@ export function Balance({ wallet, balance, onBalanceUpdate, isLoading = false }:
         </CardContent>
       </Card>
 
-      {/* Wallet Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Wallet Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Address */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Wallet Address</label>
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-              <div className="flex-1 p-3 bg-muted rounded-md font-mono text-xs sm:text-sm break-all">
-                {wallet.address}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => copyToClipboard(wallet.address, 'Address')}
-                className="self-start sm:self-auto"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Private Key */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Private Key (Base64)</label>
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-              <div className="flex-1 p-3 bg-muted rounded-md font-mono text-xs sm:text-sm break-all">
-                {showPrivateKey ? wallet.privateKey : '•'.repeat(44)}
-              </div>
-              <div className="flex space-x-2 self-start sm:self-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowPrivateKey(!showPrivateKey)}
-                >
-                  {showPrivateKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-                {showPrivateKey && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(wallet.privateKey, 'Private Key')}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Public Key */}
-          {wallet.publicKey && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Public Key (Hex)</label>
-              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                <div className="flex-1 p-3 bg-muted rounded-md font-mono text-xs sm:text-sm break-all">
-                  {wallet.publicKey}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyToClipboard(wallet.publicKey!, 'Public Key')}
-                  className="self-start sm:self-auto"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Mnemonic */}
-          {wallet.mnemonic && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Mnemonic Phrase</label>
-              <div className="p-3 bg-muted rounded-md">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {wallet.mnemonic.split(' ').map((word, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <span className="text-xs text-muted-foreground w-6">
-                        {index + 1}.
-                      </span>
-                      <span className="font-mono text-xs sm:text-sm">{word}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => copyToClipboard(wallet.mnemonic!, 'Mnemonic')}
-                className="w-full mt-2"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Mnemonic Phrase
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Export Private Keys */}
+      <ExportPrivateKeys wallet={wallet} />
 
       {/* Dialogs */}
       <EncryptBalanceDialog
