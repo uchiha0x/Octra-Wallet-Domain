@@ -15,64 +15,6 @@ function App() {
   const [selectedWalletForConnection, setSelectedWalletForConnection] = useState<Wallet | null>(null);
 
   useEffect(() => {
-    // Listen for storage changes across tabs
-    const handleStorageChange = (e: StorageEvent) => {
-      // Handle wallet unlock/lock state changes
-      if (e.key === 'isWalletLocked') {
-        const isWalletLocked = e.newValue !== 'false';
-        setIsLocked(isWalletLocked);
-        
-        // If wallet is unlocked in another tab, load the wallets
-        if (!isWalletLocked) {
-          const storedWallets = localStorage.getItem('wallets');
-          const activeWalletId = localStorage.getItem('activeWalletId');
-          
-          if (storedWallets) {
-            const parsedWallets = JSON.parse(storedWallets);
-            setWallets(parsedWallets);
-            
-            if (parsedWallets.length > 0) {
-              let activeWallet = parsedWallets[0];
-              if (activeWalletId) {
-                const foundWallet = parsedWallets.find((w: Wallet) => w.address === activeWalletId);
-                if (foundWallet) {
-                  activeWallet = foundWallet;
-                }
-              }
-              setWallet(activeWallet);
-            }
-          }
-        } else {
-          // If wallet is locked in another tab, clear local state
-          setWallet(null);
-          setWallets([]);
-        }
-      }
-      
-      // Handle wallet changes
-      if (e.key === 'wallets') {
-        if (e.newValue) {
-          const parsedWallets = JSON.parse(e.newValue);
-          setWallets(parsedWallets);
-        } else {
-          setWallets([]);
-          setWallet(null);
-        }
-      }
-      
-      // Handle active wallet changes
-      if (e.key === 'activeWalletId') {
-        if (e.newValue && wallets.length > 0) {
-          const foundWallet = wallets.find(w => w.address === e.newValue);
-          if (foundWallet) {
-            setWallet(foundWallet);
-          }
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
     // Check for dApp connection request in URL
     const urlParams = new URLSearchParams(window.location.search);
     const successUrl = urlParams.get('success_url');
@@ -96,32 +38,27 @@ function App() {
     
     if (hasPassword && walletLocked !== 'false') {
       setIsLocked(true);
-    } else {
-      const storedWallets = localStorage.getItem('wallets');
-      const activeWalletId = localStorage.getItem('activeWalletId');
-      if (storedWallets) {
-        const parsedWallets = JSON.parse(storedWallets);
-        setWallets(parsedWallets);
-        
-        // Set active wallet based on stored ID or default to first wallet
-        if (parsedWallets.length > 0) {
-          let activeWallet = parsedWallets[0];
-          if (activeWalletId) {
-            const foundWallet = parsedWallets.find((w: Wallet) => w.address === activeWalletId);
-            if (foundWallet) {
-              activeWallet = foundWallet;
-            }
+      return;
+    }
+    const storedWallets = localStorage.getItem('wallets');
+    const activeWalletId = localStorage.getItem('activeWalletId');
+    if (storedWallets) {
+      const parsedWallets = JSON.parse(storedWallets);
+      setWallets(parsedWallets);
+      
+      // Set active wallet based on stored ID or default to first wallet
+      if (parsedWallets.length > 0) {
+        let activeWallet = parsedWallets[0];
+        if (activeWalletId) {
+          const foundWallet = parsedWallets.find((w: Wallet) => w.address === activeWalletId);
+          if (foundWallet) {
+            activeWallet = foundWallet;
           }
-          setWallet(activeWallet);
         }
+        setWallet(activeWallet);
       }
     }
-
-    // Cleanup event listener
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [wallets]); // Add wallets as dependency for activeWalletId handling
+  }, []);
 
   const handleUnlock = (unlockedWallets: Wallet[]) => {
     setWallets(unlockedWallets);
@@ -178,14 +115,6 @@ function App() {
       // If wallet exists, just switch to it
       setWallet(existingWallet);
       localStorage.setItem('activeWalletId', existingWallet.address);
-      
-      // Trigger storage event for cross-tab synchronization
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'activeWalletId',
-        oldValue: localStorage.getItem('activeWalletId'),
-        newValue: existingWallet.address,
-        storageArea: localStorage
-      }));
       return;
     }
     
@@ -194,34 +123,11 @@ function App() {
     setWallet(newWallet);
     localStorage.setItem('wallets', JSON.stringify(updatedWallets));
     localStorage.setItem('activeWalletId', newWallet.address);
-    
-    // Trigger storage events for cross-tab synchronization
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'wallets',
-      oldValue: JSON.stringify(wallets),
-      newValue: JSON.stringify(updatedWallets),
-      storageArea: localStorage
-    }));
-    
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'activeWalletId',
-      oldValue: localStorage.getItem('activeWalletId'),
-      newValue: newWallet.address,
-      storageArea: localStorage
-    }));
   };
 
   const switchWallet = (selectedWallet: Wallet) => {
     setWallet(selectedWallet);
     localStorage.setItem('activeWalletId', selectedWallet.address);
-    
-    // Trigger storage event for cross-tab synchronization
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'activeWalletId',
-      oldValue: localStorage.getItem('activeWalletId'),
-      newValue: selectedWallet.address,
-      storageArea: localStorage
-    }));
   };
 
   const removeWallet = (walletToRemove: Wallet) => {
@@ -229,39 +135,15 @@ function App() {
     setWallets(updatedWallets);
     localStorage.setItem('wallets', JSON.stringify(updatedWallets));
     
-    // Trigger storage event for cross-tab synchronization
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'wallets',
-      oldValue: JSON.stringify(wallets),
-      newValue: JSON.stringify(updatedWallets),
-      storageArea: localStorage
-    }));
-    
     // If removing active wallet, switch to another or clear
     if (wallet?.address === walletToRemove.address) {
       if (updatedWallets.length > 0) {
         const newActiveWallet = updatedWallets[0];
         setWallet(newActiveWallet);
         localStorage.setItem('activeWalletId', newActiveWallet.address);
-        
-        // Trigger storage event for cross-tab synchronization
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: 'activeWalletId',
-          oldValue: walletToRemove.address,
-          newValue: newActiveWallet.address,
-          storageArea: localStorage
-        }));
       } else {
         setWallet(null);
         localStorage.removeItem('activeWalletId');
-        
-        // Trigger storage event for cross-tab synchronization
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: 'activeWalletId',
-          oldValue: walletToRemove.address,
-          newValue: null,
-          storageArea: localStorage
-        }));
       }
     }
   };
@@ -282,15 +164,6 @@ function App() {
     
     // Lock wallet
     localStorage.setItem('isWalletLocked', 'true');
-    
-    // Trigger storage event for cross-tab synchronization
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'isWalletLocked',
-      oldValue: 'false',
-      newValue: 'true',
-      storageArea: localStorage
-    }));
-    
     setIsLocked(true);
   };
 

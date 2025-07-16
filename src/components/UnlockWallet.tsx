@@ -68,14 +68,6 @@ export function UnlockWallet({ onUnlock }: UnlockWalletProps) {
       localStorage.setItem('isWalletLocked', 'false');
       localStorage.setItem('wallets', JSON.stringify(decryptedWallets));
       
-      // Trigger storage event for cross-tab synchronization
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'isWalletLocked',
-        oldValue: 'true',
-        newValue: 'false',
-        storageArea: localStorage
-      }));
-      
       toast({
         title: "Wallet Unlocked!",
         description: "Welcome back to your wallet",
