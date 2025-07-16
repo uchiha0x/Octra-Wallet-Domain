@@ -315,7 +315,7 @@ export function RPCProviderManager({ onClose }: RPCProviderManagerProps) {
                       </Badge>
                     )}
                     <Badge variant="outline" className="text-xs">
-                      Priority: {provider.priority}
+                      P.{provider.priority}
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground font-mono">

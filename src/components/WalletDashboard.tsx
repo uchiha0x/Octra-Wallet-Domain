@@ -371,9 +371,9 @@ export function WalletDashboard({
               </Button>
               <Dialog open={showAddWalletDialog} onOpenChange={setShowAddWalletDialog}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="hidden md:flex items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    <span className="hidden md:inline">Add Wallet</span>
+                    <span className="md:inline">Add Wallet</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden">
