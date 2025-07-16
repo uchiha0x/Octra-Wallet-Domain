@@ -101,7 +101,7 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
           if (amountMode === 'same') {
             isValid = true;
           } else {
-            isValid = amount && !isNaN(Number(amount)) && Number(amount) > 0;
+            isValid = !!amount && !isNaN(Number(amount)) && Number(amount) > 0;
           }
         } else {
           isValid = false;
