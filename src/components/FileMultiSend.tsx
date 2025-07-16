@@ -97,7 +97,7 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
 
       // Validate address format
       if (validateAddress(address)) {
-        isValid = !error && (!amountMode || amountMode === 'same' || (amount && !isNaN(Number(amount)) && Number(amount) > 0));
+        isValid = !Boolean(error) && (amountMode === 'same' || (amount && !isNaN(Number(amount)) && Number(amount) > 0));
         if (amountMode === 'different' && (!amount || isNaN(Number(amount)) || Number(amount) <= 0)) {
           error = 'Invalid amount';
           isValid = false;
