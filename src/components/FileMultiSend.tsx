@@ -492,7 +492,7 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
               <Upload className="h-12 w-12 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-lg font-medium">Drop your .txt file here</p>
+              <p className="text-lg font-medium">Drop .txt file containing your octra address here</p>
               <p className="text-sm text-muted-foreground">or click to browse</p>
             </div>
             <div>
