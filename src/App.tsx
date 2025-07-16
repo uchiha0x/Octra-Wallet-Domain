@@ -15,15 +15,6 @@ function App() {
   const [selectedWalletForConnection, setSelectedWalletForConnection] = useState<Wallet | null>(null);
 
   useEffect(() => {
-    // Check if wallet is locked
-    const walletLocked = localStorage.getItem('isWalletLocked');
-    const hasPassword = localStorage.getItem('walletPasswordHash');
-    
-    if (hasPassword && walletLocked !== 'false') {
-      setIsLocked(true);
-      return;
-    }
-
     // Check for dApp connection request in URL
     const urlParams = new URLSearchParams(window.location.search);
     const successUrl = urlParams.get('success_url');
@@ -41,6 +32,14 @@ function App() {
       });
     }
 
+    // Check if wallet is locked
+    const walletLocked = localStorage.getItem('isWalletLocked');
+    const hasPassword = localStorage.getItem('walletPasswordHash');
+    
+    if (hasPassword && walletLocked !== 'false') {
+      setIsLocked(true);
+      return;
+    }
     const storedWallets = localStorage.getItem('wallets');
     const activeWalletId = localStorage.getItem('activeWalletId');
     if (storedWallets) {
