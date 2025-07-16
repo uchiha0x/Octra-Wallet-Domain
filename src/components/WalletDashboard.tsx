@@ -29,6 +29,7 @@ import { MultiSend } from './MultiSend';
 import { SendTransaction } from './SendTransaction';
 import { PrivateTransfer } from './PrivateTransfer';
 import { ClaimTransfers } from './ClaimTransfers';
+import { FileMultiSend } from './FileMultiSend';
 import { TxHistory } from './TxHistory';
 import { ThemeToggle } from './ThemeToggle';
 import { ImportWallet } from './ImportWallet';
@@ -472,9 +473,10 @@ export function WalletDashboard({
 
           <TabsContent value="send">
             <Tabs defaultValue="single" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="single">Single Send</TabsTrigger>
                 <TabsTrigger value="multi">Multi Send</TabsTrigger>
+                <TabsTrigger value="file">File Multi Send</TabsTrigger>
               </TabsList>
               
               <TabsContent value="single" className="mt-6">
@@ -490,6 +492,17 @@ export function WalletDashboard({
               
               <TabsContent value="multi" className="mt-6">
                 <MultiSend 
+                  wallet={wallet} 
+                  balance={balance}
+                  nonce={nonce}
+                  onBalanceUpdate={handleBalanceUpdate}
+                  onNonceUpdate={handleNonceUpdate}
+                  onTransactionSuccess={handleTransactionSuccess}
+                />
+              </TabsContent>
+              
+              <TabsContent value="file" className="mt-6">
+                <FileMultiSend 
                   wallet={wallet} 
                   balance={balance}
                   nonce={nonce}
