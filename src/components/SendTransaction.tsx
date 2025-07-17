@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Send, AlertTriangle, Wallet as WalletIcon, CheckCircle, ExternalLink, Copy, MessageSquare, Calculator } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, sendTransaction, createTransaction } from '../utils/api';
-import { resolveAddressOrDomain } from '../utils/domainApi';
 import { AddressInput } from './AddressInput';
 import { useToast } from '@/hooks/use-toast';
 
@@ -248,7 +247,7 @@ export function SendTransaction({ wallet, balance, nonce, onBalanceUpdate, onNon
             value={recipientAddress}
             onChange={setRecipientAddress}
             onResolvedAddress={setResolvedRecipientAddress}
-            placeholder="oct... or domain.oct"
+            placeholder="oct..."
           />
         </div>
 

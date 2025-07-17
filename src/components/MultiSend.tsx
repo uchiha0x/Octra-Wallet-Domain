@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Plus, Trash2, AlertTriangle, Wallet as WalletIcon, CheckCircle, ExternalLink, Copy, MessageSquare } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, sendTransaction, createTransaction } from '../utils/api';
-import { resolveAddressOrDomain } from '../utils/domainApi';
 import { AddressInput } from './AddressInput';
 import { useToast } from '@/hooks/use-toast';
 
@@ -363,7 +362,7 @@ export function MultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonceUpda
                       value={recipient.address}
                       onChange={(value) => updateRecipient(index, 'address', value)}
                       onResolvedAddress={(resolved) => updateResolvedAddress(index, resolved)}
-                      placeholder="oct... or domain.oct"
+                      placeholder="oct..."
                     />
                   </div>
 

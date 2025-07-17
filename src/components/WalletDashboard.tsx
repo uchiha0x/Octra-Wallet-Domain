@@ -16,7 +16,6 @@ import {
   PieChart,
   Shield,
   Gift,
-  Globe,
   ChevronDown,
   Plus,
   Trash2,
@@ -35,7 +34,6 @@ import { ThemeToggle } from './ThemeToggle';
 import { ImportWallet } from './ImportWallet';
 import { GenerateWallet } from './GenerateWallet';
 import { RPCProviderManager } from './RPCProviderManager';
-import { RegisterDomain } from './RegisterDomain';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, getTransactionHistory } from '../utils/api';
 import { useToast } from '@/hooks/use-toast';
@@ -435,7 +433,7 @@ export function WalletDashboard({
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <PieChart className="h-4 w-4" />
               <span className="hidden sm:inline">Overview</span>
@@ -451,10 +449,6 @@ export function WalletDashboard({
             <TabsTrigger value="claim" className="flex items-center gap-2">
               <Gift className="h-4 w-4" />
               <span className="hidden sm:inline">Claim</span>
-            </TabsTrigger>
-            <TabsTrigger value="domain" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              <span className="hidden sm:inline">Domain</span>
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
@@ -528,12 +522,6 @@ export function WalletDashboard({
             />
           </TabsContent>
 
-          <TabsContent value="domain">
-            <RegisterDomain
-              wallet={wallet}
-              onTransactionSuccess={handleTransactionSuccess}
-            />
-          </TabsContent>
 
           <TabsContent value="history">
             <TxHistory 

@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
-import { resolveAddressOrDomain, isOctDomain } from '../utils/domainApi';
 
 interface AddressInputProps {
   value: string;
@@ -17,7 +16,7 @@ interface AddressInputProps {
 export function AddressInput({ 
   value, 
   onChange, 
-  placeholder = "oct... or domain.oct", 
+  placeholder = "oct...", 
   disabled = false,
   className = "",
   onResolvedAddress
@@ -35,35 +34,16 @@ export function AddressInput({
       }
 
       // If it's already a valid OCT address, no need to resolve
-      if (value.startsWith('oct') && value.length > 40 && !isOctDomain(value)) {
+      if (value.startsWith('oct') && value.length > 40) {
         setResolvedAddress(value);
         setResolutionError(null);
         onResolvedAddress?.(value);
         return;
       }
 
-      // If it's a domain, resolve it
-      if (isOctDomain(value)) {
-        setIsResolving(true);
-        setResolutionError(null);
-        
-        try {
-          const address = await resolveAddressOrDomain(value);
-          setResolvedAddress(address);
-          setResolutionError(null);
-          onResolvedAddress?.(address);
-        } catch (error) {
-          setResolvedAddress(null);
-          setResolutionError(error instanceof Error ? error.message : 'Resolution failed');
-          onResolvedAddress?.('');
-        } finally {
-          setIsResolving(false);
-        }
-      } else {
-        setResolvedAddress(null);
-        setResolutionError('Invalid address or domain format');
-        onResolvedAddress?.('');
-      }
+      setResolvedAddress(null);
+      setResolutionError('Invalid address format');
+      onResolvedAddress?.('');
     };
 
     const timeoutId = setTimeout(resolveInput, 500);
@@ -93,11 +73,7 @@ export function AddressInput({
       return <Badge variant="secondary" className="text-xs">Resolving...</Badge>;
     }
     
-    if (resolvedAddress && isOctDomain(value)) {
-      return <Badge variant="default" className="text-xs bg-green-100 text-green-800">Domain</Badge>;
-    }
-    
-    if (resolvedAddress && !isOctDomain(value)) {
+    if (resolvedAddress) {
       return <Badge variant="default" className="text-xs bg-blue-100 text-blue-800">Address</Badge>;
     }
     
@@ -131,15 +107,6 @@ export function AddressInput({
           )}
         </div>
       </div>
-      
-      {resolvedAddress && isOctDomain(value) && (
-        <div className="p-2 bg-green-50 dark:bg-green-950/50 rounded-md">
-          <div className="text-xs text-green-700 dark:text-green-300 mb-1">Resolves to:</div>
-          <div className="font-mono text-xs text-green-800 dark:text-green-200 break-all">
-            {resolvedAddress}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

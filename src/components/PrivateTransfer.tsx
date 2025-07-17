@@ -9,7 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { Shield, AlertTriangle, Wallet as WalletIcon, CheckCircle, ExternalLink, Copy, Loader2 } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { fetchEncryptedBalance, createPrivateTransfer, getAddressInfo } from '../utils/api';
-import { resolveAddressOrDomain } from '../utils/domainApi';
 import { AddressInput } from './AddressInput';
 import { useToast } from '@/hooks/use-toast';
 
@@ -275,7 +274,7 @@ export function PrivateTransfer({ wallet, onTransactionSuccess }: PrivateTransfe
             value={recipientAddress}
             onChange={setRecipientAddress}
             onResolvedAddress={setResolvedRecipientAddress}
-            placeholder="oct... or domain.oct"
+            placeholder="oct..."
           />
           
           {/* Recipient Status */}
