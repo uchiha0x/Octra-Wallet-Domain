@@ -12,7 +12,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Upload, FileText, AlertTriangle, Wallet as WalletIcon, CheckCircle, ExternalLink, Copy, Zap, Trash2 } from 'lucide-react';
 import { Wallet } from '../types/wallet';
 import { fetchBalance, sendTransaction, createTransaction } from '../utils/api';
-import { resolveAddressOrDomain } from '../utils/domainApi';
 import { useToast } from '@/hooks/use-toast';
 
 interface FileRecipient {
@@ -43,8 +42,7 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
   const { toast } = useToast();
 
   const validateAddress = (address: string) => {
-    const octAddressRegex = /^oct[1-9A-HJ-NP-Za-km-z]{44}$/;
-    return octAddressRegex.test(address) || address.endsWith('.oct');
+    return octAddressRegex.test(address);
   };
 
   const calculateFee = (amount: number) => {
@@ -136,7 +134,7 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
         if (!recipient.isValid) return recipient;
 
         try {
-          const resolvedAddress = await resolveAddressOrDomain(recipient.address);
+          const resolvedAddress = recipient.address; // No domain resolution needed
           return {
             ...recipient,
             resolvedAddress,
@@ -146,7 +144,7 @@ export function FileMultiSend({ wallet, balance, nonce, onBalanceUpdate, onNonce
           return {
             ...recipient,
             isValid: false,
-            error: `Resolution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+            error: `Invalid address format`
           };
         }
       })
